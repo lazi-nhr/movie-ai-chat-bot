@@ -125,12 +125,50 @@ def jaccard(a: list[str], b: list[str]) -> float:
         return 0.0
     return len(A & B) / len(A | B)
 
+
+def surface_variants(surface: str) -> list[tuple[str, list[str]]]:
+    """Return a few normalized variants for a surface mention."""
+    s = surface.strip()
+    variants = {norm_for_match(s)}
+    if ":" in s:
+        variants.add(norm_for_match(s.replace(":", " ")))
+        variants.add(norm_for_match(s.replace(":", "")))
+    return [(v, v.split()) for v in variants if v]
+
+
+def score_surface_against(
+    name_norm: str,
+    name_tokens: list[str],
+    surface_norm: str,
+    surface_tokens: list[str],
+) -> float:
+    """Score how well a surface form matches a stored name (0..1)."""
+    jac = jaccard(name_tokens, surface_tokens)
+    fuzz = difflib.SequenceMatcher(None, surface_norm, name_norm).ratio()
+
+    boost = 0.0
+    if surface_norm and name_norm:
+        if name_norm.startswith(surface_norm) or surface_norm.startswith(name_norm):
+            boost += 0.10
+        if surface_norm in name_norm or name_norm in surface_norm:
+            boost += 0.05
+
+    score = 0.55 * fuzz + 0.40 * jac + boost
+    return max(0.0, min(1.0, score))
+
 # ---------------------- EMBEDDING INDEX / INFERENCE ---------------------------
 
 @dataclass
 class Ranked:
     uri: str
     score: float   # higher is better (cosine similarity)
+
+
+@dataclass
+class KGValue:
+    value: str
+    is_literal: bool
+    lang: str | None = None
 
 class EmbedIndex:
     def __init__(self, emb_dir: str, conf: dict):
@@ -206,10 +244,10 @@ class EmbedIndex:
                 return (uri, 0.98)
 
         # try multiple surface variants and keep best
-        variants = self._surface_variants(surface)
+        variants = surface_variants(surface)
         for uri, ln, nl, toks in self.ent_name_index:
             for s_norm, s_toks in variants:
-                sc = self._score_surface_against(nl, toks, s_norm, s_toks)
+                sc = score_surface_against(nl, toks, s_norm, s_toks)
                 if sc > best_score:
                     best_uri, best_score = uri, sc
 
@@ -231,52 +269,19 @@ class EmbedIndex:
                 best_uri, best_score = uri, r
         return (best_uri, best_score)
     
-    def _surface_variants(self, surface: str) -> list[tuple[str, list[str]]]:
-        """
-        Build a few normalized variants to be more tolerant with punctuation/underscores/colons.
-        Returns list of (normalized_string, tokens).
-        """
-        s = surface.strip()
-        variants = {norm_for_match(s)}
-        # also try replacing ":" with space and with nothing (users often include subtitles)
-        variants.add(norm_for_match(s.replace(":", " ")))
-        variants.add(norm_for_match(s.replace(":", "")))
-        # underscores, dashes and slashes are handled in norm_for_match already
-        return [(v, v.split()) for v in variants if v]
-
-    def _score_surface_against(self, name_norm: str, name_tokens: list[str], surface_norm: str, surface_tokens: list[str]) -> float:
-        """
-        Combine token Jaccard + fuzzy ratio + substring/startswith boosts into a single 0..1 score.
-        """
-        jac = jaccard(name_tokens, surface_tokens)
-        # difflib on normalized single strings
-        fuzz = difflib.SequenceMatcher(None, surface_norm, name_norm).ratio()
-
-        boost = 0.0
-        # substring / startswith help when titles include punctuation or subtitles
-        if surface_norm and name_norm:
-            if name_norm.startswith(surface_norm) or surface_norm.startswith(name_norm):
-                boost += 0.10
-            if surface_norm in name_norm or name_norm in surface_norm:
-                boost += 0.05
-
-        # weighted sum (tune if needed)
-        score = 0.55 * fuzz + 0.40 * jac + boost
-        return max(0.0, min(1.0, score))
-
     def link_entity_candidates(self, surface: str, top_k: int = 5) -> list[tuple[str, float]]:
         """
         Return top-k candidate URIs with scores (for clarification prompts).
         """
         if not surface:
             return []
-        variants = self._surface_variants(surface)
+        variants = surface_variants(surface)
         scores = np.zeros(len(self.ent_name_index), dtype=np.float32)
 
         for i, (uri, ln, nl, toks) in enumerate(self.ent_name_index):
             sc_max = 0.0
             for s_norm, s_toks in variants:
-                sc = self._score_surface_against(nl, toks, s_norm, s_toks)
+                sc = score_surface_against(nl, toks, s_norm, s_toks)
                 if sc > sc_max:
                     sc_max = sc
             scores[i] = sc_max
@@ -318,6 +323,187 @@ class EmbedIndex:
         idx = np.argpartition(-scores, range(k))[:k]
         idx = idx[np.argsort(-scores[idx])]
         return [Ranked(self.id2ent[i], float(scores[i])) for i in idx]
+
+def _parse_nt_line(line: str) -> tuple[str, str, str, bool, str | None] | None:
+    """Parse a single N-Triples line. Returns (subj, pred, obj, is_literal, lang)."""
+    line = line.strip()
+    if not line or line.startswith("#"):
+        return None
+    if line.endswith('.'):
+        line = line[:-1].strip()
+
+    n = len(line)
+    i = 0
+
+    def skip_ws(idx: int) -> int:
+        while idx < n and line[idx].isspace():
+            idx += 1
+        return idx
+
+    def parse_uri(idx: int) -> tuple[str, int]:
+        if idx >= n or line[idx] != '<':
+            raise ValueError("Expected < for URI")
+        end = line.find('>', idx + 1)
+        if end == -1:
+            raise ValueError("Unterminated URI")
+        return line[idx + 1:end], end + 1
+
+    def parse_literal(idx: int) -> tuple[str, int, str | None]:
+        if idx >= n or line[idx] != '"':
+            raise ValueError("Expected quote for literal")
+        idx += 1
+        chars: list[str] = []
+        escaped = False
+        while idx < n:
+            ch = line[idx]
+            if ch == '"' and not escaped:
+                break
+            if ch == '\\' and not escaped:
+                escaped = True
+            else:
+                escaped = False
+            chars.append(ch)
+            idx += 1
+        if idx >= n:
+            raise ValueError("Unterminated literal")
+        literal = ''.join(chars)
+        idx += 1
+        idx = skip_ws(idx)
+        lang: str | None = None
+        if idx < n - 1 and line[idx] == '^' and line[idx + 1] == '^':
+            idx += 2
+            idx = skip_ws(idx)
+            if idx < n and line[idx] == '<':
+                _, idx = parse_uri(idx)
+            idx = skip_ws(idx)
+        elif idx < n and line[idx] == '@':
+            idx += 1
+            start = idx
+            while idx < n and (line[idx].isalpha() or line[idx] in {'-', '_'}):
+                idx += 1
+            lang = line[start:idx].lower() or None
+            idx = skip_ws(idx)
+        return literal, idx, lang
+
+    i = skip_ws(i)
+    subj, i = parse_uri(i)
+    i = skip_ws(i)
+    pred, i = parse_uri(i)
+    i = skip_ws(i)
+    if i >= n:
+        raise ValueError("Missing object")
+    if line[i] == '<':
+        obj, i = parse_uri(i)
+        return (subj, pred, obj, False, None)
+    if line[i] == '"':
+        obj, i, lang = parse_literal(i)
+        return (subj, pred, obj, True, lang)
+    raise ValueError("Unexpected object token")
+
+
+class KnowledgeGraph:
+    LABEL_PREDICATES = {
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        "http://schema.org/name",
+        "http://xmlns.com/foaf/0.1/name",
+        "http://purl.org/dc/terms/title",
+    }
+
+    def __init__(self, path: str):
+        self.path = path
+        self.adj: dict[str, dict[str, list[KGValue]]] = {}
+        self.uri_labels: dict[str, list[tuple[str, str | None]]] = {}
+        self.name_index: list[tuple[str, str, str, list[str]]] = []
+        self._load()
+
+    def _load(self) -> None:
+        seen_name_keys: set[tuple[str, str]] = set()
+        with open(self.path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    parsed = _parse_nt_line(line)
+                except ValueError:
+                    continue
+                if not parsed:
+                    continue
+                subj, pred, obj, is_literal, lang = parsed
+                bucket = self.adj.setdefault(subj, {}).setdefault(pred, [])
+                bucket.append(KGValue(obj, is_literal, lang))
+                if is_literal and pred in self.LABEL_PREDICATES:
+                    self.uri_labels.setdefault(subj, []).append((obj, lang))
+                    norm = norm_for_match(obj)
+                    if norm:
+                        key = (subj, norm)
+                        if key not in seen_name_keys:
+                            self.name_index.append((subj, obj, norm, norm.split()))
+                            seen_name_keys.add(key)
+
+        for subj in list(self.adj.keys()):
+            ln = localname(subj)
+            norm_ln = norm_for_match(ln)
+            if not norm_ln:
+                continue
+            key = (subj, norm_ln)
+            if key in seen_name_keys:
+                continue
+            self.name_index.append((subj, ln, norm_ln, norm_ln.split()))
+            seen_name_keys.add(key)
+
+    def link_entity(self, surface: str) -> tuple[str | None, float]:
+        if not surface:
+            return (None, 0.0)
+        variants = surface_variants(surface)
+        best_uri, best_score = None, 0.0
+        for uri, _label, norm_label, toks in self.name_index:
+            for s_norm, s_toks in variants:
+                sc = score_surface_against(norm_label, toks, s_norm, s_toks)
+                if sc > best_score:
+                    best_uri, best_score = uri, sc
+        return (best_uri, best_score)
+
+    def link_entity_candidates(self, surface: str, top_k: int = 5) -> list[tuple[str, float]]:
+        if not surface:
+            return []
+        variants = surface_variants(surface)
+        scores = np.zeros(len(self.name_index), dtype=np.float32)
+        for i, (_uri, _label, norm_label, toks) in enumerate(self.name_index):
+            sc_max = 0.0
+            for s_norm, s_toks in variants:
+                sc = score_surface_against(norm_label, toks, s_norm, s_toks)
+                if sc > sc_max:
+                    sc_max = sc
+            scores[i] = sc_max
+        k = min(top_k, len(scores))
+        idx = np.argpartition(-scores, range(k))[:k]
+        idx = idx[np.argsort(-scores[idx])]
+        out: list[tuple[str, float]] = []
+        for i in idx:
+            if scores[i] <= 0.0:
+                continue
+            uri = self.name_index[i][0]
+            out.append((uri, float(scores[i])))
+        return out
+
+    def lookup(self, subject_uri: str, relation_uri: str) -> list[KGValue]:
+        return list(self.adj.get(subject_uri, {}).get(relation_uri, []))
+
+    def best_label(self, uri: str) -> str | None:
+        labels = self.uri_labels.get(uri)
+        if not labels:
+            return None
+        for text, lang in labels:
+            if lang and lang.startswith("en"):
+                return text
+        return labels[0][0]
+
+    def format_value(self, value: KGValue) -> str:
+        if value.is_literal:
+            return value.value
+        label = self.best_label(value.value)
+        if label:
+            return label
+        return localname(value.value)
+
 
 # ------------------- NLU: classify + extract mentions -------------------------
 
@@ -412,6 +598,19 @@ class Agent:
         emb_dir = require_env("EMBEDDINGS_DIR")
         self.index = EmbedIndex(emb_dir, CONFIG)
 
+        kg_path = os.environ.get("KNOWLEDGE_GRAPH_PATH", "/space_mounts/atai-hs25/dataset/graph.nt")
+        if os.path.exists(kg_path):
+            print(f"Loading knowledge graph from {kg_path} ...")
+            try:
+                self.kg = KnowledgeGraph(kg_path)
+                print("Knowledge graph ready.")
+            except Exception as exc:
+                print(f"Failed to load knowledge graph: {exc}")
+                self.kg = None
+        else:
+            print(f"Knowledge graph file not found at {kg_path}; continuing without it.")
+            self.kg = None
+
         self.speakeasy.register_callback(self.on_new_message, EventType.MESSAGE)
         self.speakeasy.register_callback(self.on_new_reaction, EventType.REACTION)
 
@@ -446,16 +645,41 @@ class Agent:
         sim_intent = is_similarity(q)
         rel_phrase = None if sim_intent else extract_relation_phrase(q)
 
-        # Extract & link entity
+        # Extract & link entity (embeddings + knowledge graph labels)
         surface = extract_entity_surface(q)
-        uri, el_conf = self.index.link_entity(surface) if surface else (None, 0.0)
-        if not uri or el_conf < CONFIG["Thresholds"]["EntityLinkMin"]:
+        embed_uri, el_conf = self.index.link_entity(surface) if surface else (None, 0.0)
+        kg_uri, kg_conf = (self.kg.link_entity(surface) if surface and self.kg else (None, 0.0))
+
+        threshold = CONFIG["Thresholds"]["EntityLinkMin"]
+        resolved_uri: str | None = None
+        has_embedding = False
+
+        if embed_uri and el_conf >= threshold:
+            resolved_uri = embed_uri
+            has_embedding = True
+
+        if not resolved_uri and kg_uri and kg_conf >= threshold:
+            resolved_uri = kg_uri
+            has_embedding = kg_uri in self.index.ent2id
+
+        if not resolved_uri:
             if surface:
-                cand = self.index.link_entity_candidates(surface, top_k=5)
-                if cand:
-                    suggestions = "\n".join(
-                        f"- {localname(u)}  (score {s:.2f})" for u, s in cand
-                    )
+                suggestion_lines: list[str] = []
+                seen: set[str] = set()
+                for cand_uri, score in self.index.link_entity_candidates(surface, top_k=5):
+                    if cand_uri in seen:
+                        continue
+                    seen.add(cand_uri)
+                    suggestion_lines.append(f"- {localname(cand_uri)}  (score {score:.2f})")
+                if self.kg:
+                    for cand_uri, score in self.kg.link_entity_candidates(surface, top_k=5):
+                        if cand_uri in seen:
+                            continue
+                        seen.add(cand_uri)
+                        label = self.kg.best_label(cand_uri) or localname(cand_uri)
+                        suggestion_lines.append(f"- {label}  (score {score:.2f})")
+                if suggestion_lines:
+                    suggestions = "\n".join(suggestion_lines)
                     return (
                         f'I could not confidently identify the entity "{surface}".\n'
                         f'Did you mean one of these?\n{suggestions}\n'
@@ -466,8 +690,10 @@ class Agent:
 
         # Similarity
         if sim_intent:
+            if not has_embedding:
+                return "I found the entity but do not have embeddings for it, so I cannot compute similarity."
             topk = CONFIG["Answer"]["TopKSimilar"]
-            ranked = self.index.similar(uri, topk)
+            ranked = self.index.similar(resolved_uri, topk)
             if not ranked or ranked[0].score < CONFIG["Thresholds"]["TopScoreMin"]:
                 return "I couldn’t find confident similar entities."
             items = "; ".join(f"{localname(r.uri)} ({r.score:.2f})" for r in ranked)
@@ -486,7 +712,27 @@ class Agent:
             )
 
         topk = CONFIG["Answer"]["TopKPrediction"]
-        ranked = self.index.predict_tail(uri, rel_uri, topk)
+        kg_items: list[str] = []
+        if self.kg:
+            raw_items = self.kg.lookup(resolved_uri, rel_uri)
+            seen_text: set[str] = set()
+            for value in raw_items:
+                formatted = self.kg.format_value(value)
+                if formatted in seen_text:
+                    continue
+                seen_text.add(formatted)
+                kg_items.append(formatted)
+                if len(kg_items) >= topk:
+                    break
+        if kg_items:
+            rel_short = localname(rel_uri).replace("_", " ")
+            items = "; ".join(kg_items)
+            return f"(Knowledge Graph Answer) {rel_short} of {surface}: {items}"
+
+        if not has_embedding:
+            return "I couldn't find this relation in the knowledge graph and do not have embeddings for it."
+
+        ranked = self.index.predict_tail(resolved_uri, rel_uri, topk)
         if not ranked or ranked[0].score < CONFIG["Thresholds"]["TopScoreMin"]:
             return "I couldn't produce a confident embedding prediction."
 
