@@ -8,32 +8,28 @@ import numpy as np
 
 from speakeasypy import Chatroom, EventType, Speakeasy
 
-"""
-To run the bot do the following:
-1.  Open terminal
-2.  Run "python chat_bot.py"
-3.  Wait until graph is loaded and the bot is listening (this can take a while)
+"""Run the chat bot after configuring credentials and embedding paths.
 
+Environment variables used by the bot:
 
-To test and interact with the bot do the following:
+* ``SPEAKEASY_URL`` – base URL of the Speakeasy instance (required)
+* ``SPEAKEASY_USERNAME`` – account username (required)
+* ``SPEAKEASY_PASSWORD`` – account password (required)
+* ``EMBEDDINGS_DIR`` – directory with ``entity_embeds.npy`` etc. (required)
 
-1.  Go to https://speakeasy.ifi.uzh.ch/
-2.  Login
-3.  Go to "Chat"
-4.  Click on "Request Chat"
-5.  Enter "CyanPeekingMouse" and click on "Request"
+Example::
+
+    export SPEAKEASY_URL="https://example.org"
+    export SPEAKEASY_USERNAME="MyUser"
+    export SPEAKEASY_PASSWORD="MyPassword"
+    export EMBEDDINGS_DIR="/path/to/embeddings"
+    python chat_bot.py
 """
 
 # --------------------------- CONFIG -------------------------------------------
 
 CONFIG = {
-    "Hosting": {
-        "URL": "https://speakeasy.ifi.uzh.ch",
-        "Username": "CyanPeekingMouse",
-        "Password": "Qe5Hf3zJ",
-    },
     "Embeddings": {
-        "Dir": "/space_mounts/atai-hs25/dataset/embeddings",
         "EntityVec": "entity_embeds.npy",
         "EntityIds": "entity_ids.del",
         "RelationVec": "relation_embeds.npy",
@@ -42,6 +38,7 @@ CONFIG = {
     # thresholds are easy to tune from logs
     "Thresholds": {
         "EntityLinkMin": 0.45,   # minimum fuzzy score for entity linking
+        "RelationLinkMin": 0.40,  # minimum fuzzy score for relation linking
         "TopScoreMin": 0.30,     # minimum top score to accept an embedding answer
     },
     "Answer": {
@@ -49,6 +46,14 @@ CONFIG = {
         "TopKPrediction": 3,
     }
 }
+
+
+def require_env(var_name: str) -> str:
+    """Fetch a required environment variable, raising a clear error if missing."""
+    value = os.environ.get(var_name)
+    if not value:
+        raise RuntimeError(f"Set the {var_name} environment variable before starting the bot.")
+    return value
 
 # ------------------------ UTILS (text & ids) ----------------------------------
 
@@ -83,11 +88,13 @@ def read_id_file(path: str) -> list[str]:
     Returns: list of URI/ID strings in row order (aligned to vectors)
     """
     ids: list[str] = []
+    blank_counter = 0
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
-                ids.append("")
+                ids.append(f"<blank:{blank_counter}>")
+                blank_counter += 1
                 continue
             parts = re.split(r"[\t ]+", line)
             # Heuristic: prefer the longest field that looks like a URI-ish token.
@@ -217,8 +224,9 @@ class EmbedIndex:
             return (None, 0.0)
         p = " ".join(tokenize_name(phrase))
         best_uri, best_score = None, 0.0
-        for uri, ln, _ in self.rel_name_index:
-            r = difflib.SequenceMatcher(None, p, " ".join(tokenize_name(ln))).ratio()
+        for uri, ln, _norm_ln, _toks in self.rel_name_index:
+            candidate = " ".join(tokenize_name(ln))
+            r = difflib.SequenceMatcher(None, p, candidate).ratio()
             if r > best_score:
                 best_uri, best_score = uri, r
         return (best_uri, best_score)
@@ -357,20 +365,51 @@ def extract_entity_surface(q: str) -> str | None:
     caps = re.findall(r"([A-Z][A-Za-z0-9&'.,:-]*(?:\s+[A-Z][A-Za-z0-9&'.,:-]*)*)", q)
     if caps:
         return max(caps, key=len).strip()
+    # Final fallback: longest span of non-stopwords, even if lowercase
+    tokens = re.findall(r"[A-Za-z0-9&'.,:-]+", q)
+    if not tokens:
+        return None
+    stopwords = {
+        "a", "an", "and", "are", "at", "be", "by", "can", "could", "did", "do", "does",
+        "find", "for", "from", "give", "i", "in", "is", "it", "its", "list", "me",
+        "movie", "movies", "of", "on", "or", "please", "recommend", "show", "similar",
+        "tell", "that", "the", "their", "them", "they", "this", "those", "to", "was",
+        "we", "were", "what", "when", "where", "which", "who", "why", "with", "you",
+        "your", "directed", "written", "genre", "rating", "capital", "language", "country",
+    }
+    spans: list[list[str]] = []
+    current: list[str] = []
+    for token in tokens:
+        t_lower = token.lower()
+        if t_lower in stopwords:
+            if current:
+                spans.append(current)
+                current = []
+            continue
+        current.append(token)
+    if current:
+        spans.append(current)
+    if spans:
+        spans.sort(key=lambda span: len(" ".join(span)), reverse=True)
+        return " ".join(spans[0]).strip()
+    # fallback to single informative token
+    for token in reversed(tokens):
+        if token.lower() not in stopwords:
+            return token.strip()
     return None
 
 # ----------------------- Agent (Speakeasy wiring) -----------------------------
 
 class Agent:
     def __init__(self):
-        self.url = CONFIG["Hosting"]["URL"]
-        self.username = CONFIG["Hosting"]["Username"]
-        self.password = CONFIG["Hosting"]["Password"]
+        self.url = require_env("SPEAKEASY_URL")
+        self.username = require_env("SPEAKEASY_USERNAME")
+        self.password = require_env("SPEAKEASY_PASSWORD")
 
         self.speakeasy = Speakeasy(host=self.url, username=self.username, password=self.password)
         self.speakeasy.login()
 
-        emb_dir = CONFIG["Embeddings"]["Dir"]
+        emb_dir = require_env("EMBEDDINGS_DIR")
         self.index = EmbedIndex(emb_dir, CONFIG)
 
         self.speakeasy.register_callback(self.on_new_message, EventType.MESSAGE)
@@ -411,6 +450,17 @@ class Agent:
         surface = extract_entity_surface(q)
         uri, el_conf = self.index.link_entity(surface) if surface else (None, 0.0)
         if not uri or el_conf < CONFIG["Thresholds"]["EntityLinkMin"]:
+            if surface:
+                cand = self.index.link_entity_candidates(surface, top_k=5)
+                if cand:
+                    suggestions = "\n".join(
+                        f"- {localname(u)}  (score {s:.2f})" for u, s in cand
+                    )
+                    return (
+                        f'I could not confidently identify the entity "{surface}".\n'
+                        f'Did you mean one of these?\n{suggestions}\n'
+                        f'Please copy the exact name above (or paste the ID/URI if you have it).'
+                    )
             hint = f' (found "{surface}" with low confidence)' if surface else ""
             return f'I could not confidently identify the entity{hint}. Please quote the exact name.'
 
@@ -429,19 +479,11 @@ class Agent:
                     "Try e.g. 'who directed \"MOVIE\"', 'what is the genre of \"MOVIE\"', or 'capital of \"COUNTRY\"'.")
 
         rel_uri, rel_conf = self.index.link_relation(rel_phrase)
-        if not uri or el_conf < CONFIG["Thresholds"]["EntityLinkMin"]:
-            if surface:
-                cand = self.index.link_entity_candidates(surface, top_k=5)
-                if cand:
-                    suggestions = "\n".join(
-                        f"- {localname(u)}  (score {s:.2f})" for u, s in cand
-                    )
-                    return (
-                        f'I could not confidently identify the entity "{surface}".\n'
-                        f'Did you mean one of these?\n{suggestions}\n'
-                        f'Please copy the exact name above (or paste the ID/URI if you have it).'
-                    )
-            return "I could not confidently identify the entity. Please quote the exact name."
+        if not rel_uri or rel_conf < CONFIG["Thresholds"]["RelationLinkMin"]:
+            return (
+                "I detected an embeddings question but could not match the relation phrase. "
+                "Please rephrase it (e.g. 'directed by', 'genre of', 'capital of')."
+            )
 
         topk = CONFIG["Answer"]["TopKPrediction"]
         ranked = self.index.predict_tail(uri, rel_uri, topk)
