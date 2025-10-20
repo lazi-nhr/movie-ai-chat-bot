@@ -8,28 +8,32 @@ import numpy as np
 
 from speakeasypy import Chatroom, EventType, Speakeasy
 
-"""Run the chat bot after configuring credentials and embedding paths.
+"""
+To run the bot do the following:
+1.  Open terminal
+2.  Run "python chat_bot.py"
+3.  Wait until graph is loaded and the bot is listening (this can take a while)
 
-Environment variables used by the bot:
 
-* ``SPEAKEASY_URL`` – base URL of the Speakeasy instance (required)
-* ``SPEAKEASY_USERNAME`` – account username (required)
-* ``SPEAKEASY_PASSWORD`` – account password (required)
-* ``EMBEDDINGS_DIR`` – directory with ``entity_embeds.npy`` etc. (required)
+To test and interact with the bot do the following:
 
-Example::
-
-    export SPEAKEASY_URL="https://example.org"
-    export SPEAKEASY_USERNAME="MyUser"
-    export SPEAKEASY_PASSWORD="MyPassword"
-    export EMBEDDINGS_DIR="/path/to/embeddings"
-    python chat_bot.py
+1.  Go to https://speakeasy.ifi.uzh.ch/
+2.  Login
+3.  Go to "Chat"
+4.  Click on "Request Chat"
+5.  Enter "CyanPeekingMouse" and click on "Request"
 """
 
 # --------------------------- CONFIG -------------------------------------------
 
 CONFIG = {
+    "Hosting": {
+        "URL": "https://speakeasy.ifi.uzh.ch",
+        "Username": "CyanPeekingMouse",
+        "Password": "Qe5Hf3zJ",
+    },
     "Embeddings": {
+        "Dir": "/space_mounts/atai-hs25/dataset/embeddings",
         "EntityVec": "entity_embeds.npy",
         "EntityIds": "entity_ids.del",
         "RelationVec": "relation_embeds.npy",
@@ -37,7 +41,7 @@ CONFIG = {
     },
     # thresholds are easy to tune from logs
     "Thresholds": {
-        "EntityLinkMin": 0.45,   # minimum fuzzy score for entity linking
+        "EntityLinkMin": 0.30,   # minimum fuzzy score for entity linking
         "RelationLinkMin": 0.40,  # minimum fuzzy score for relation linking
         "TopScoreMin": 0.30,     # minimum top score to accept an embedding answer
     },
@@ -588,14 +592,14 @@ def extract_entity_surface(q: str) -> str | None:
 
 class Agent:
     def __init__(self):
-        self.url = require_env("SPEAKEASY_URL")
-        self.username = require_env("SPEAKEASY_USERNAME")
-        self.password = require_env("SPEAKEASY_PASSWORD")
+        self.url = CONFIG["Hosting"]["URL"]
+        self.username = CONFIG["Hosting"]["Username"]
+        self.password = CONFIG["Hosting"]["Password"]
 
         self.speakeasy = Speakeasy(host=self.url, username=self.username, password=self.password)
         self.speakeasy.login()
 
-        emb_dir = require_env("EMBEDDINGS_DIR")
+        emb_dir = CONFIG["Embeddings"]["Dir"]
         self.index = EmbedIndex(emb_dir, CONFIG)
 
         kg_path = os.environ.get("KNOWLEDGE_GRAPH_PATH", "/space_mounts/atai-hs25/dataset/graph.nt")
