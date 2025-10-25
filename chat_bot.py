@@ -8,7 +8,9 @@ import numpy as np
 
 from speakeasypy import Chatroom, EventType, Speakeasy
 
-# --------------------------- RUN ----------------------------------------------
+# -----------------------------
+# INSTRUCTIONS
+# -----------------------------
 
 """
 To run the bot do the following:
@@ -26,7 +28,10 @@ To test and interact with the bot do the following:
 5.  Enter "CyanPeekingMouse" and click on "Request"
 """
 
-# --------------------------- DATASET STRUCTURE --------------------------------
+
+# -----------------------------
+# DATASET STRUCTURE
+# -----------------------------
 
 """
 The dataset directory structure is as follows:
@@ -62,10 +67,12 @@ The dataset directory structure is as follows:
 └── ratings/
     ├── item_ratings.csv
     └── user_ratings.csv
-
 """
 
-# --------------------------- CONFIG -------------------------------------------
+
+# -----------------------------
+# CONFIGURATION
+# -----------------------------
 
 CONFIG = {
     "Hosting": {
@@ -100,7 +107,10 @@ def require_env(var_name: str) -> str:
         raise RuntimeError(f"Set the {var_name} environment variable before starting the bot.")
     return value
 
-# ------------------------ UTILS (text & ids) ----------------------------------
+
+# -----------------------------
+# UTILITIES
+# -----------------------------
 
 def normalize_text(s: str) -> str:
     if s is None:
@@ -201,7 +211,10 @@ def score_surface_against(
     score = 0.55 * fuzz + 0.40 * jac + boost
     return max(0.0, min(1.0, score))
 
-# ---------------------- EMBEDDING INDEX / INFERENCE ---------------------------
+
+# -----------------------------
+# EMBEDDING INDEX / INFERENCE
+# -----------------------------
 
 @dataclass
 class Ranked:
@@ -550,7 +563,9 @@ class KnowledgeGraph:
         return localname(value.value)
 
 
-# ------------------- NLU: classify + extract mentions -------------------------
+# -----------------------------
+# NLU: classify + extract mentions
+# -----------------------------
 
 SIMILARITY_CUES = [
     r"\bsimilar (to|movies like|like)\b",
@@ -560,13 +575,13 @@ SIMILARITY_CUES = [
 
 RELATION_HINTS = [
     # order matters: try longer/more specific first
-    r"\bdirected by\b|\bdirect(ed)?\b",
-    r"\bwritten by\b|\bscreenwrit(er|ten)\b",
-    r"\bgenre(s)?\b",
-    r"\brating\b|\bmpaa\b",
-    r"\bcapital (of)?\b|\bcapital\b",
-    r"\blanguage(s)?\b",
-    r"\bcountry\b|\borigin\b",
+    r"who (?:is )?(?:the )?(?:director|direct(?:ed|or)?)\b|direct(?:ed|or)? by\b",
+    r"who (?:is )?(?:the )?(?:screenwriter|writer|wrote)\b|writ(?:ten|er) by\b",
+    r"what (?:is )?(?:the )?genre(?:s)?\b|genre(?:s)?\b",
+    r"what (?:is )?(?:the )?rating\b|mpaa\b",
+    r"(?:what is )?(?:the )?capital (?:of)?\b",
+    r"what (?:is|are) (?:the )?language(?:s)?\b",
+    r"(?:what is )?(?:the )?country\b|origin\b",
 ]
 
 def is_similarity(q: str) -> bool:
@@ -575,11 +590,34 @@ def is_similarity(q: str) -> bool:
 
 def extract_relation_phrase(q: str) -> str | None:
     qn = " ".join(q.lower().split())
+    # First check for "who wrote/directed" pattern
+    if re.search(r"who (?:wrote|directed)\b", qn, re.IGNORECASE):
+        if "wrote" in qn.lower():
+            return "written by"
+        return "directed by"
+
+    # Then check standard patterns
     for pat in RELATION_HINTS:
-        m = re.search(pat, qn)
+        m = re.search(pat, qn, re.IGNORECASE)
         if m:
-            return m.group(0)
-    # also allow "what is the X of ..." → capture X
+            phrase = m.group(0).lower()
+            if any(word in phrase for word in ["director", "directed", "directs"]):
+                return "directed by"
+            if any(word in phrase for word in ["writer", "wrote", "written", "screenwriter"]):
+                return "written by"
+            if "genre" in phrase:
+                return "genre"
+            if "rating" in phrase or "mpaa" in phrase:
+                return "rating"
+            if "capital" in phrase:
+                return "capital"
+            if "language" in phrase:
+                return "language"
+            if "country" in phrase or "origin" in phrase:
+                return "country"
+            return phrase.strip()
+
+    # Try "what is the X of" patterns
     m2 = re.search(r"what\s+is\s+the\s+([a-zA-Z\s]+?)\s+of\b", qn)
     if m2:
         return m2.group(1).strip()
@@ -629,7 +667,10 @@ def extract_entity_surface(q: str) -> str | None:
             return token.strip()
     return None
 
-# ----------------------- Agent (Speakeasy wiring) -----------------------------
+
+# -----------------------------
+# Agent (Speakeasy wiring)
+# -----------------------------
 
 class Agent:
     def __init__(self):
@@ -730,8 +771,30 @@ class Agent:
                         f'Did you mean one of these?\n{suggestions}\n'
                         f'Please copy the exact name above (or paste the ID/URI if you have it).'
                     )
-            hint = f' (found "{surface}" with low confidence)' if surface else ""
-            return f'I could not confidently identify the entity{hint}. Please quote the exact name.'
+            return "I couldn't find that movie or entity in my database. Please check the spelling or try a different title."
+
+        # Similarity
+        if sim_intent:
+            if not has_embedding:
+                return "I found the entity but do not have embeddings for it, so I cannot compute similarity."
+            topk = CONFIG["Answer"]["TopKSimilar"]
+            ranked = self.index.similar(resolved_uri, topk)
+            if not ranked or ranked[0].score < CONFIG["Thresholds"]["TopScoreMin"]:
+                return "I couldn't find confident similar entities."
+            items = "; ".join(f"{localname(r.uri)} ({r.score:.2f})" for r in ranked)
+            return f"Similar to {surface}: {items}"
+
+        # Link prediction
+        if not rel_phrase:
+            return ("I couldn't identify what you want to know about this movie/entity. "
+                    "Try asking something like 'who directed [Movie]' or 'what is the genre of [Movie]'")
+
+        rel_uri, rel_conf = self.index.link_relation(rel_phrase)
+        if not rel_uri or rel_conf < CONFIG["Thresholds"]["RelationLinkMin"]:
+            return (
+                f"I couldn't understand the relation '{rel_phrase}'. "
+                "Try common questions like 'who directed it' or 'what is the genre'"
+            )
 
         # Similarity
         if sim_intent:
