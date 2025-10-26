@@ -259,7 +259,7 @@ def main():
     graph_path = os.path.join(dataset_dir, "graph.nt")
     
     # Output directory
-    out_dir = os.path.join(base_dir, "data_cache")
+    out_dir = os.path.join(base_dir, "cache")
     
     # Language settings
     lang = "en"
