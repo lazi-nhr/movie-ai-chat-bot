@@ -99,20 +99,12 @@ CONFIG = {
     }
 }
 
-
-def require_env(var_name: str) -> str:
-    """Fetch a required environment variable, raising a clear error if missing."""
-    value = os.environ.get(var_name)
-    if not value:
-        raise RuntimeError(f"Set the {var_name} environment variable before starting the bot.")
-    return value
-
-
 # -----------------------------
 # UTILITIES
 # -----------------------------
 
 def normalize_text(s: str) -> str:
+    """Unicode normalize and trim whitespace. (e.g. "Café  "" -> "Cafe")"""
     if s is None:
         return ""
     s = unicodedata.normalize("NFKC", s)
@@ -127,6 +119,7 @@ def localname(uri: str) -> str:
     return frag
 
 def tokenize_name(x: str) -> list[str]:
+    """Simple tokenizer for local names: lowercase, split on punctuation/whitespace."""
     x = normalize_text(x).lower()
     x = re.sub(r"[_\-./]+", " ", x)
     x = re.sub(r"\s+", " ", x).strip()
@@ -175,6 +168,7 @@ def tokens(s: str) -> list[str]:
     return norm_for_match(s).split()
 
 def jaccard(a: list[str], b: list[str]) -> float:
+    """Jaccard similarity between two token lists."""
     A, B = set(a), set(b)
     if not A or not B:
         return 0.0
@@ -273,12 +267,18 @@ class EmbedIndex:
 
     @staticmethod
     def _safe_l2norm(X: np.ndarray) -> np.ndarray:
+        """
+        L2-normalize rows of a matrix, avoiding division by zero.
+        """
         norms = np.linalg.norm(X, axis=1, keepdims=True)
         norms[norms == 0] = 1.0
         return X / norms
 
     @staticmethod
     def _build_name_index(uris: list[str]) -> list[tuple[str, str, str, list[str]]]:
+        """
+        Build a name index: list of tuples
+        """
         # (uri, localname, norm_local, tokens_local)
         idx = []
         for u in uris:
@@ -290,6 +290,9 @@ class EmbedIndex:
     # ---- Lookups ----
 
     def link_entity(self, surface: str) -> tuple[str | None, float]:
+        """
+        Map a surface form to an entity URI via fuzzy localname matching.
+        """
         if not surface:
             return (None, 0.0)
 
@@ -358,6 +361,9 @@ class EmbedIndex:
     # ---- Inference ----
 
     def similar(self, seed_uri: str, top_k: int) -> list[Ranked]:
+        """
+        Find the top-k most similar entities to the seed entity based on cosine similarity
+        """
         sid = self.ent2id.get(seed_uri)
         if sid is None:
             return []
@@ -370,6 +376,9 @@ class EmbedIndex:
         return [Ranked(self.id2ent[i], float(sims[i])) for i in idx]
 
     def predict_tail(self, head_uri: str, rel_uri: str, top_k: int) -> list[Ranked]:
+        """
+        Given a head entity and relation, predict the top-k most likely tail entities
+        """
         hid = self.ent2id.get(head_uri)
         rid = self.rel2id.get(rel_uri)
         if hid is None or rid is None:
