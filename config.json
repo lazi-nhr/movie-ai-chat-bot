@@ -1,0 +1,22 @@
+{
+    "Hosting": {
+        "URL": "https://speakeasy.ifi.uzh.ch",
+        "Username": "CyanPeekingMouse",
+        "Password": "Qe5Hf3zJ"
+    },
+    "Data": {
+        "Download_URL": "https://files.ifi.uzh.ch/ddis/teaching/2025/ATAI/dataset/",
+        "Directory": "dataset/",
+        "Cache": {
+            "Root": "cache/",
+            "NER": {
+                "Dataset": "cache/ner_dataset.csv",
+                "Model": "cache/crf_model.joblib"
+            },
+            "Mappings": {
+                "Relations": "cache/relations/label_to_identifier.json",
+                "Entities": "cache/entities/label_to_identifier.json"
+            }
+        }
+    }
+}
