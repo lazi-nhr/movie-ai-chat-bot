@@ -8,23 +8,18 @@ import sklearn_crfsuite
 
 from sklearn.model_selection import train_test_split
 
-## Configuration
-CONFIG = {
-    "CACHE_DIR": "cache/",
-    "NER": "cache/ner_dataset.csv",
-    "CRF": "cache/crf_model.joblib",
-    "RELATIONS_LABELS": "cache/relations/label_to_identifier.json",
-    "ENTITIES_LABELS": "cache/entities/label_to_identifier.json",
-}
-
-## Install packages
+# Install packages
 #!pip -q install -U editdistance rdflib pandas numpy scikit-learn sklearn-crfsuite
+
+# Configuration
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
 
 class CRF():
     def __init__(self):
-        self.crf_path = CONFIG["CRF"]
-        self.ner_path = CONFIG["NER"]
-        self.crf = self.load_crf()
+        self.crf_path = CONFIG["Data"]["NER"]["Model"]
+        self.ner_path = CONFIG["Data"]["NER"]["Dataset"]
+        #self.crf = self.load_crf()
 
     # Load named enttity recognition (NER) training data
     def load_crf(self):
@@ -32,10 +27,11 @@ class CRF():
         # load model if exists, otherwise train and save it
         if os.path.exists(self.crf_path):
             loaded_crf = joblib.load(self.crf_path)
+            print(f"Loaded pre-trained CRF model from {self.crf_path} for NER.")
             return loaded_crf
 
         self.df = pd.read_csv(self.ner_path, encoding = "ISO-8859-1")
-        self.df = self.ds[:10000]
+        self.df = self.df[:10000]
         self.df = self.df.ffill()
         self.sentences = self.collate(self.df)
         self.train_sentences, self.test_sentences = train_test_split(self.sentences, test_size=0.3, random_state=0)
@@ -55,6 +51,7 @@ class CRF():
         trained_crf.fit(self.X_train, self.y_train)
         joblib.dump(trained_crf, self.crf_path)
 
+        print(f"Trained new CRF model and saved to {self.crf_path} for NER.")
         return trained_crf
 
     @staticmethod
@@ -123,9 +120,43 @@ class CRF():
 class Extraction(CRF):
     def __init__(self):
         super().__init__()
+        self.separators = CONFIG["Format"]["Question"]["Seperators"]
+
+    def extract_entity(
+            self,
+            question: str
+            ) -> str | None:
+        """
+        Extracts the substring found between single quotes (' or `) from a given question string.
+        
+        Args:
+            question (str): The input string to search for quoted content
+            
+        Returns:
+            str: The text found between single quotes, or empty string if no quotes found
+        """
+        # Find first occurrence of either quote type
+        start_quote = -1
+        end_quote = -1
+        for i, char in enumerate(question):
+            if char in self.separators:
+                if start_quote == -1:
+                    start_quote = i
+                else:
+                    end_quote = i
+                break
+                
+        if start_quote == -1:
+            return None
+            
+        # Extract text between quotes
+        return question[start_quote + 1:end_quote-1]
     
     # Implement NER method to extract the entity from the question
-    def extract_entity(self, question):
+    def extract_entity_crf(
+            self, 
+            question: str
+            ) -> str | None:
         # Convert question into the format expected by the CRF model
         question = question[0].lower() + question[1:] # make first letter of question lowercase
         # remove any marking punctuation
@@ -173,7 +204,7 @@ class Extraction(CRF):
             elif not tag.startswith('I-'):  # Outside of entity
                 in_entity = False
         
-        result = ''.join(entity) if entity else None
+        result = ' '.join(entity) if entity else None
         
         # Debug information
         #print("Words:", words)
@@ -182,10 +213,13 @@ class Extraction(CRF):
         return result
 
     @staticmethod
-    def link_entity(surface: str) -> tuple[str | None, float]:
+    def link_entity(
+        surface: str
+        ) -> tuple[str | None, str | None, float | None, int | None]:
+
         distance = 9999
         if not surface:
-            return (None, distance)
+            return (None, None, None, None)
 
         with open("cache/entities/label_to_identifier.json", "r", encoding="utf-8") as f:
             index = json.load(f)
@@ -198,107 +232,78 @@ class Extraction(CRF):
         return (best_label, uri, score, distance)
 
     @staticmethod
-    def extract_relation(question: str) -> str:
-        """Extract relation from question with POS tagging"""
+    def extract_relation(
+        question: str,
+        entity_label: str | None = None
+        ) -> str | None:
+        """
+        Extract relation from question with specific handling for film-related queries.
+        Handles both direct mentions and question-based implications.
+        
+        Args:
+            question (str): The question to extract relation from
+            entity_label (str | None): Optional entity label to remove from question
+            
+        Returns:
+            str | None: Extracted relation or None if no relation found
+        """
+        # Load film-specific relations
+        with open("cache/relations/film_relations.json", "r", encoding="utf-8") as f:
+            film_relations = json.load(f)
+            
         # Normalize question
-        question = question.strip().rstrip("?!.,").strip()
+        question = question.lower().strip().rstrip("?!.,'`\"").strip()
+        
+        # Remove entity_label from question if provided
+        if entity_label:
+            question = question.replace(entity_label.lower(), "").strip()
+        
+        # Direct pattern matching for common film relation phrases
+        for relation_phrase, _ in film_relations.items():
+            if relation_phrase in question:
+                return relation_phrase
+                
+        # Question-based relation mapping
         words = question.split()
         
-        # Create POS tags with focus on relation words
-        pos_tags = []
-
-        # Comprehensive list of movie-domain relation indicators
-        relation_indicators = [
-            # Core movie roles
-            'director', 'producer', 'screenwriter', 'writer', 'actor', 'composer',
-            'cast member', 'voice actor', 'narrator', 'executive producer', 'star', 
-            'assistant director', 'art director', 'production designer', 'stars',
-            
-            # Technical roles
-            'cinematographer', 'editor', 'sound designer', 'costume designer',
-            'makeup artist', 'storyboard artist', 'animator', 'film editor',
-            
-            # Movie characteristics
-            'genre', 'rating', 'classification', 'format', 'language',
-            'runtime', 'release date', 'box office', 'budget',
-            
-            # Specific ratings
-            'mpaa', 'bbfc', 'fsk', 'pegi', 'esrb',
-            
-            # Production related
-            'studio', 'distributor', 'production company', 'filmed',
-            'filmed at', 'filmed in', 'recorded at', 'shot at',
-            
-            # Creative elements
-            'based on', 'adapted from', 'inspired by', 'music by',
-            'theme by', 'score by', 'soundtrack',
-            
-            # Verbs (different forms)
-            'directed', 'produced', 'written', 'composed',
-            'edited', 'designed', 'created', 'developed'
-        ]
-        
-        # Track potential relation words
-        relation_words = []
-        in_relation = False
-        
-        for i, word in enumerate(words):
-            word_lower = word.lower()
-            
-            # Check if word is a relation indicator
-            if word_lower in relation_indicators:
-                pos_tags.append('REL')
-                relation_words.append(word_lower)
-                in_relation = True
-            # Handle common question patterns
-            elif word_lower in ['who', 'what', 'where', 'when', 'why', 'how']:
-                pos_tags.append('WP')
-                in_relation = False
-            elif word_lower in ['is', 'are', 'was', 'were']:
-                pos_tags.append('VBZ')
-                in_relation = False
-            elif word_lower in ['the', 'a', 'an']:
-                pos_tags.append('DT')
-            elif word_lower in ['of', 'in', 'by', 'with', 'for', 'at']:
-                pos_tags.append('IN')
-                in_relation = False
-            else:
-                # If we're in a relation phrase and see an unknown word, it might be part of the relation
-                if in_relation and not word.istitle():  # Not likely to be part of entity if titlecased
-                    pos_tags.append('REL')
-                    relation_words.append(word_lower)
-                else:
-                    pos_tags.append('O')
-                    in_relation = False
-        
-        # Extract relation phrase
-        if relation_words:
-            # Join consecutive relation words
-            relation_phrase = []
-            current_phrase = []
-            
-            for word, tag in zip(words, pos_tags):
-                if tag == 'REL':
-                    current_phrase.append(word.lower())
-                elif current_phrase:
-                    relation_phrase.append(' '.join(current_phrase))
-                    current_phrase = []
-                    
-            if current_phrase:  # Don't forget last phrase
-                relation_phrase.append(' '.join(current_phrase))
+        # Look for question patterns that imply specific relations
+        if "who" in words:
+            if any(w in words for w in ["direct", "directed", "director"]):
+                return "director"
+            if any(w in words for w in ["write", "wrote", "written", "writer", "screenwriter"]):
+                return "screenwriter"
+            if any(w in words for w in ["act", "acted", "actor", "star", "starring"]):
+                return "cast member"
                 
-            # Return the longest relation phrase found
-            return max(relation_phrase, key=len) if relation_phrase else None
-        
+        if "what" in words:
+            if "genre" in words or "type" in question:
+                return "genre"
+            if any(w in words for w in ["country", "from"]):
+                return "country"
+                
+        if "when" in words:
+            if any(phrase in question for phrase in ["come out", "came out", "release", "released"]):
+                return "release date"
+                
+        # Handle special cases where the relation might be implied
+        if "genre" in question or "type of film" in question:
+            return "genre"
+        if "country" in question:
+            return "country"
+            
+        # If no specific relation is found, return None
         return None
 
     @staticmethod
-    def link_relation(surface: str) -> tuple[str | None, float]:
+    def link_relation(
+        surface: str
+        ) -> tuple[str | None, str | None, float | None, int | None]:
+        
         distance = 9999
         if not surface:
-            return (None, distance)
+            return (None, None, None, None)
 
-        with open("cache/relations/label_to_identifier.json", "r", encoding="utf-8") as f:
+        with open("cache/relations/film_relations.json", "r", encoding="utf-8") as f:
             index = json.load(f)
 
         for key, value in index.items():

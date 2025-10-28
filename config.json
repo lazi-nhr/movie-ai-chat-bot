@@ -4,19 +4,31 @@
         "Username": "CyanPeekingMouse",
         "Password": "Qe5Hf3zJ"
     },
+
     "Data": {
-        "Download_URL": "https://files.ifi.uzh.ch/ddis/teaching/2025/ATAI/dataset/",
+        "Dataset_URL": "https://files.ifi.uzh.ch/ddis/teaching/2025/ATAI/dataset/",
         "Directory": "dataset/",
-        "Cache": {
-            "Root": "cache/",
-            "NER": {
-                "Dataset": "cache/ner_dataset.csv",
-                "Model": "cache/crf_model.joblib"
-            },
-            "Mappings": {
-                "Relations": "cache/relations/label_to_identifier.json",
-                "Entities": "cache/entities/label_to_identifier.json"
-            }
+        "Cache": "cache/",
+        "NER": {
+            "Dataset": "cache/ner_dataset.csv",
+            "Model": "cache/crf_model.joblib"
+        },
+        "Mappings": {
+            "Relations": "cache/relations/label_to_identifier.json",
+            "Entities": "cache/entities/label_to_identifier.json"
+        }
+    },
+
+    "Format": {
+        "Question": {
+            "General": "Please answer this question: {question}",
+            "Factual": "Please answer this question with a factual approach: {question}",
+            "Embedding": "Please answer this question with an embedding approach: {question}",
+            "Seperators": "'`‘’"
+        },
+        "Answer": {
+            "Factual": "The factual answer is: {answer}",
+            "Embedding": "The answer suggested by embeddings is: {entity_label} (type: {type_qid})"
         }
     }
 }

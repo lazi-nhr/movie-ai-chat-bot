@@ -4,25 +4,13 @@ from rdflib import Graph
 from sklearn.metrics import pairwise_distances
 import json
 
-from extraction import Extraction
-
-# Embeddings for the DDIS Movie Graph
-CONFIG = {
-    "Hosting": {
-        "URL": "https://speakeasy.ifi.uzh.ch",
-        "Username": "CyanPeekingMouse",
-        "Password": "Qe5Hf3zJ"
-    },
-    "Data": {
-        "Download_URL": "https://files.ifi.uzh.ch/ddis/teaching/2025/ATAI/dataset/",
-        "Directory": "dataset/",
-        "Cache": "cache/",
-    }
-}
+# Configuration
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
 
 class Embeddings():
     def __init__(self):
-        self.graph = self.load_graph()
+        # self.graph = self.load_graph()
         (self.entity_emb, self.relation_emb) = self.load_embeddings()
         (self.ent2id, self.id2ent,
          self.ent2lbl, self.lbl2ent,
@@ -32,7 +20,9 @@ class Embeddings():
     def load_graph(self):
         graph = Graph()
         path = CONFIG["Data"]["Directory"] + "graph.nt"
+        print(f"Loading graph from {path}...")
         graph.parse(path, format="nt")
+        print("Graph loaded.")
         return graph
     
     def load_embeddings(self):
@@ -65,7 +55,12 @@ class Embeddings():
         
         return ent2id, id2ent, ent2lbl, lbl2ent, rel2id, id2rel, rel2lbl, lbl2rel
     
-    def get_best_tail(self, head_uri: str, relation_uri: str, top_k: int = 5) -> list[tuple]:
+    def get_best_tail(
+            self, 
+            head_uri: str, 
+            relation_uri: str, 
+            top_k: int = 1
+            ) -> list[tuple]:
         """
         Find the most likely tail entities given a head entity and relation.
         
@@ -87,8 +82,10 @@ class Embeddings():
         # Compute distances to all possible tail entities
         dist = pairwise_distances(lhs.reshape(1, -1), self.entity_emb).reshape(-1)
         
-        # Get top-k predictions
-        most_likely = dist.argsort()[:top_k]
+        # Get sorted indices and filter those that are in our mapping
+        sorted_indices = dist.argsort()
+        valid_indices = [idx for idx in sorted_indices if idx in self.id2ent]
+        most_likely = valid_indices[:top_k]
         
         results = []
         for rank, idx in enumerate(most_likely):
@@ -99,7 +96,12 @@ class Embeddings():
         
         return results
     
-    def get_best_head(self, tail_uri: str, relation_uri: str, top_k: int = 5) -> list[tuple]:
+    def get_best_head(
+            self, 
+            tail_uri: str, 
+            relation_uri: str, 
+            top_k: int = 1
+            ) -> list[tuple]:
         """
         Find the most likely head entities given a tail entity and relation.
         
@@ -122,8 +124,10 @@ class Embeddings():
         # Compute distances to all possible head entities
         dist = pairwise_distances(rhs.reshape(1, -1), self.entity_emb).reshape(-1)
         
-        # Get top-k predictions
-        most_likely = dist.argsort()[:top_k]
+        # Get sorted indices and filter those that are in our mapping
+        sorted_indices = dist.argsort()
+        valid_indices = [idx for idx in sorted_indices if idx in self.id2ent]
+        most_likely = valid_indices[:top_k]
         
         results = []
         for rank, idx in enumerate(most_likely):
@@ -134,33 +138,34 @@ class Embeddings():
         
         return results
     
+    def get_best_result(
+            self, 
+            entity_uri: str, 
+            relation_uri: str, 
+            top_k: int = 1
+            ) -> list[tuple]:
+        """
+        Try both head and tail predictions and return the results with the better score.
+        
+        Args:
+            entity_uri: URI of the known entity (head or tail)
+            relation_uri: URI of the relation
+            top_k: Number of top predictions to return
+        
+        Returns:
+            List of tuples (entity_uri, label, score, rank)
+        """
+        if entity_uri not in self.ent2id:
+            raise ValueError(f"Unknown entity URI: {entity_uri}")
 
+        # Try both predictions
+        tail_results = self.get_best_tail(entity_uri, relation_uri, top_k)
+        head_results = self.get_best_head(entity_uri, relation_uri, top_k)
 
+        # Compare best scores (lower is better since we use distances)
+        best_tail_score = tail_results[0][2] if tail_results else float('inf')
+        best_head_score = head_results[0][2] if head_results else float('inf')
 
+        print(f"Best tail: {tail_results[0][1]}, Best head: {head_results[0][1]}")
 
-## Example Questions
-extraction = Extraction()
-embeddings = Embeddings()
-
-questions = {
-    "Who is the director of Good Will Hunting?": "Gus Van Sant is the director of Good Will Hunting.",
-    "Who directed The Bridge on the River Kwai?": "David Lean directed The Bridge on the River Kwai.",
-    "Who is the director of Star Wars: Episode VI - Return of the Jedi": "David Lean directed The Bridge on the River Kwai.",
-    "Who is the screenwriter of The Masked Gang: Cyprus?": "The answer suggested by embeddings: Cengiz Küçükayvaz, Murat Aslan, and Melih Ekener.",
-    "What is the MPAA film rating of Weathering with You?": "According to embeddings, the MPAA film rating of Weathering with You is PG-13.",
-    "What is the genre of Good Neighbors?": "The genre of Good Neighbors is likely to be drama, comedy-drama, and comedy film.",
-    "Who is the director of Batman 1989?": "Hi, the director of Batman 1989 is Timothy Walter Burton",
-}
-for question in questions.keys():
-    extracted_entity = extraction.extract_entity(question)
-    entity_label, entity_URI, score, distance = extraction.link_entity(extracted_entity)
-
-    extracted_relation = extraction.extract_relation(question)
-    relation_label, relation_URI, rel_score, rel_distance = extraction.link_relation(extracted_relation)
-
-    results = embeddings.get_best_head(entity_URI, relation_URI, top_k=1)
-
-    for result in results:
-        head_uri, head_label, head_score, head_rank = result
-        print(f"Q: {question}")
-        print(f"A: {head_label} ({head_uri})")
+        return tail_results if best_tail_score < best_head_score else head_results

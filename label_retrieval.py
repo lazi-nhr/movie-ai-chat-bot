@@ -2,7 +2,6 @@ import csv
 import json
 import os
 import re
-import sys
 import unicodedata
 from collections import defaultdict
 
@@ -124,15 +123,15 @@ def collect_labels(
         keep_entities: set[str],
         keep_relations: set[str],
         langs: tuple[str, ...]
-        ) -> tuple[dict, dict, list[tuple[str,str,str,str]]]:
+        ) -> tuple[dict, dict, list[tuple[str,str,str,str]], set[str], set[str], dict[str, str]]:
     """
-    Iterate over graph.nt and collect labels for:
-      - entities in keep_entities
-      - relations in keep_relations
+    Iterate over graph.nt and collect labels for all entities and relations.
     Returns:
       forward_map: uri -> {'labels': set([...]), 'norms': set([...])}
       inverted_index: norm_text -> set([uri, ...])
       rows_for_csv: list of (uri, kind, label, lang)
+      all_entities: set of all entity URIs found in the graph
+      all_relations: set of all relation URIs found in the graph
     """
     g = Graph()
     print(f"Parsing graph: {graph_path}")
@@ -142,6 +141,8 @@ def collect_labels(
     forward: dict[str, dict] = {}
     inverted: dict[str, set] = defaultdict(set)
     rows: list[tuple[str,str,str,str]] = []
+    all_entities: set[str] = set()
+    all_relations: set[str] = set()
 
     def add(uri: str, kind: str, label: str, lang: str):
         # nt = norm_text(label)
@@ -155,6 +156,30 @@ def collect_labels(
         inverted[nt].add(uri)
         rows.append((uri, kind, label, lang or ""))
 
+    # Dictionary to store entity types
+    entity_types: dict[str, str] = {}
+    
+    # First pass: collect all entities, relations and entity types
+    for s, p, o in g.triples((None, None, None)):
+        if isinstance(s, URIRef):
+            subj = str(s)
+            if subj.startswith(QID_URI_PREFIX):
+                all_entities.add(subj)
+            elif subj.startswith(PID_URI_PREFIX):
+                all_relations.add(subj)
+        if isinstance(p, URIRef):
+            pred = str(p)
+            if pred.startswith(PID_URI_PREFIX):
+                all_relations.add(pred)
+                
+            # Check for "instance of" property (P31)
+            if pred == PID_URI_PREFIX + "P31" and isinstance(s, URIRef) and isinstance(o, URIRef):
+                # Extract only the QIDs
+                subject_qid = str(s).replace(QID_URI_PREFIX, "")
+                object_qid = str(o).replace(QID_URI_PREFIX, "")
+                entity_types[subject_qid] = object_qid
+
+    # Second pass: collect labels
     for s, p, o in g.triples((None, None, None)):
         if not isinstance(s, URIRef) or not isinstance(p, URIRef):
             continue
@@ -168,10 +193,12 @@ def collect_labels(
             continue
         subj = str(s)
 
-        if subj in keep_entities:
+        if subj in all_entities:
             add(subj, "entity", str(o), lang)
-        elif subj in keep_relations:
+        elif subj in all_relations:
             add(subj, "relation", str(o), lang)
+            
+    return forward, inverted, rows, all_entities, all_relations, entity_types
 
     return forward, inverted, rows
 
@@ -214,17 +241,36 @@ def write_json(
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         if isinstance(obj, dict):
-            # Write each entry on a new line
-            f.write("{\n")
-            items = list(obj.items())
-            for i, (key, value) in enumerate(items):
-                json_str = json.dumps({key: value}, ensure_ascii=False)
-                f.write(f"  {json_str[1:-1]}")  # Remove the outer {}
-                if i < len(items) - 1:
-                    f.write(",\n")
-                else:
-                    f.write("\n")
-            f.write("}")
+            # Special handling for entity_types.json
+            if path.endswith("entity_types.json"):
+                # Convert QIDs back to full URIs for the keys
+                formatted_dict = {
+                    f"{QID_URI_PREFIX}{key}": value
+                    for key, value in obj.items()
+                }
+                # Write each entry on a new line
+                f.write("{\n")
+                items = list(formatted_dict.items())
+                for i, (key, value) in enumerate(items):
+                    f.write(f'  "{key}": "{value}"')
+                    if i < len(items) - 1:
+                        f.write(",\n")
+                    else:
+                        f.write("\n")
+                f.write("}")
+            else:
+                # Regular dictionary handling
+                # Write each entry on a new line
+                f.write("{\n")
+                items = list(obj.items())
+                for i, (key, value) in enumerate(items):
+                    json_str = json.dumps({key: value}, ensure_ascii=False)
+                    f.write(f"  {json_str[1:-1]}")  # Remove the outer {}
+                    if i < len(items) - 1:
+                        f.write(",\n")
+                    else:
+                        f.write("\n")
+                f.write("}")
         else:
             json.dump(obj, f, ensure_ascii=False)
     print(f"Wrote {path}")
@@ -244,6 +290,75 @@ def serialize_forward(
             "norms": sorted(list(meta.get("norms", []))),
         }
     return out
+
+def create_film_label_mappings(output_path: str) -> None:
+    """
+    Creates a JSON file containing mappings between film-related labels and their Wikidata property identifiers.
+    The mappings include various aspects of films such as cast, crew, technical details, and business information.
+    
+    Args:
+        output_path (str): The path where the JSON file should be saved
+        
+    Returns:
+        None: The function writes the mappings to the specified file
+    """
+    film_mappings = {
+        # Cast and Crew
+        "screenwriter": f"{PID_URI_PREFIX}P58",
+        "writer": f"{PID_URI_PREFIX}P58",
+        "written by": f"{PID_URI_PREFIX}P58",
+        "wrote": f"{PID_URI_PREFIX}P58",
+        "screenplay": f"{PID_URI_PREFIX}P58",
+        "director": f"{PID_URI_PREFIX}P57",
+        "directed": f"{PID_URI_PREFIX}P57",
+        "cast member": f"{PID_URI_PREFIX}P161",
+        "actor": f"{PID_URI_PREFIX}P161",
+        "starring": f"{PID_URI_PREFIX}P161",
+        "producer": f"{PID_URI_PREFIX}P162",
+        "produced": f"{PID_URI_PREFIX}P162",
+        "composer": f"{PID_URI_PREFIX}P86",
+        "composed": f"{PID_URI_PREFIX}P86",
+        "music": f"{PID_URI_PREFIX}P86",
+        "cinematographer": f"{PID_URI_PREFIX}P344",
+        "director of photography": f"{PID_URI_PREFIX}P344",
+        "editor": f"{PID_URI_PREFIX}P1040",
+        "edited": f"{PID_URI_PREFIX}P1040",
+        "film editor": f"{PID_URI_PREFIX}P1040",
+        
+        # Film Properties
+        "genre": f"{PID_URI_PREFIX}P136",
+        "film genre": f"{PID_URI_PREFIX}P136",
+        "type of film": f"{PID_URI_PREFIX}P136",
+        "type": f"{PID_URI_PREFIX}P136",
+        "mpaa rating": f"{PID_URI_PREFIX}P1657",
+        "film rating": f"{PID_URI_PREFIX}P1657",
+        "rating": f"{PID_URI_PREFIX}P1657",
+        "rated": f"{PID_URI_PREFIX}P1657",
+        "duration": f"{PID_URI_PREFIX}P2047",
+        "runtime": f"{PID_URI_PREFIX}P2047",
+        "length": f"{PID_URI_PREFIX}P2047",
+        "release date": f"{PID_URI_PREFIX}P577",
+        "publication date": f"{PID_URI_PREFIX}P577",
+        "country of origin": f"{PID_URI_PREFIX}P495",
+        "country": f"{PID_URI_PREFIX}P495",
+        "original language": f"{PID_URI_PREFIX}P364",
+        "language": f"{PID_URI_PREFIX}P364",
+        
+        # Business Information
+        "production company": f"{PID_URI_PREFIX}P272",
+        "distributor": f"{PID_URI_PREFIX}P750",
+        "distributed": f"{PID_URI_PREFIX}P750",
+        "box office": f"{PID_URI_PREFIX}P2142",
+        "budget": f"{PID_URI_PREFIX}P2130",
+        "production budget": f"{PID_URI_PREFIX}P2130",
+        "cost": f"{PID_URI_PREFIX}P2130",
+        
+        # Film Relationships
+        "follows": f"{PID_URI_PREFIX}P155",
+        "followed by": f"{PID_URI_PREFIX}P156"
+    }
+    
+    write_json(film_mappings, output_path)
 
 # ------------------------------- MAIN -----------------------------------------
 
@@ -272,18 +387,20 @@ def main():
     entities_set = set(entity_ids)
     relations_set = set(relation_ids)
 
-    if not entities_set:
-        print("No entities loaded from entity_ids.del; aborting.", file=sys.stderr)
-        sys.exit(1)
-
     langs = tuple(x for x in (lang, extra_lang) if x is not None)
 
-    forward_map, inverted_index, label_rows = collect_labels(
+    forward_map, inverted_index, label_rows, all_entities, all_relations, entity_types = collect_labels(
         graph_path=graph_path,
         keep_entities=entities_set,
         keep_relations=relations_set,
         langs=langs,
     )
+
+    # Update entities and relations sets to include all from graph
+    entities_set = all_entities
+    relations_set = all_relations
+    entity_ids = sorted(list(all_entities))
+    relation_ids = sorted(list(all_relations))
 
     # Create entity mappings
     entity_idx_to_id = {idx: eid for idx, eid in enumerate(entity_ids)}
@@ -325,6 +442,7 @@ def main():
     write_json(entity_id_to_idx, os.path.join(entities_dir, "identifier_to_index.json"))
     write_json(entity_id_to_label, os.path.join(entities_dir, "identifier_to_label.json"))
     write_json(entity_label_to_id, os.path.join(entities_dir, "label_to_identifier.json"))
+    write_json(entity_types, os.path.join(entities_dir, "entity_types.json"))
 
     # Write relation mappings
     write_json(relation_idx_to_id, os.path.join(relations_dir, "index_to_identifier.json"))
@@ -337,5 +455,16 @@ def main():
 
     print("Done.")
 
+def create_film_mappings():
+    """
+    Convenience function to create film-related label mappings in the cache directory.
+    """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(base_dir, "cache")
+    output_path = os.path.join(out_dir, "film_relations.json")
+    create_film_label_mappings(output_path)
+    print(f"Created film-related label mappings at: {output_path}")
+
 if __name__ == "__main__":
     main()
+    create_film_mappings()
