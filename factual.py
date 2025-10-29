@@ -25,13 +25,25 @@ class Factual():
     def translate_to_sparql(self, entity_uri: str, relation_uri: str) -> str:
         # Implement here maybe use method "format_results" below?
         # Keep in mind that we might have to handle pure SPARQL queries too
-        pass 
+        if entity_uri and relation_uri:
+            qry = f"""
+            SELECT ?object 
+            WHERE {{
+            <{entity_uri}> <{relation_uri}> ?object
+            }}
+            """
+        else:
+            # If only one argument is given a pure SPARQL query might have been passed
+            qry = entity_uri if entity_uri else relation_uri
+        result = self.sparql_query(qry)
+        return self.format_results(result)
+
 
     
     # This method is not used in the current code. 
     # It is copied from the first evaluation event. 
     # Ajdust it to return a list of strings with the results (labels).
-    def format_results(self, results) -> str:
+    def format_results(self, results) -> list[str]:
         try:
             if results.type == 'ASK':
                 return "true" if bool(results) else "false"
