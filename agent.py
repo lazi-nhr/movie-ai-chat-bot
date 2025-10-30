@@ -71,8 +71,14 @@ class Agent:
         Returns:
             tuple[str, str]: (pure_question, question_type)
             - pure_question: The question without the format prefix
-            - question_type: One of 'general', 'factual', or 'embedding'
+            - question_type: One of 'sparql', 'general', 'factual', or 'embedding'
         """
+        # check if question is plain sparql query
+        q = question.strip().lower()
+        if q.startswith("prefix") or any(k in q for k in ("select", "ask", "construct", "describe")):
+            return question, "sparql"
+
+        # convert CONFIG formats to regex patterns
         def format_to_regex(fmt: str) -> re.Pattern:
             # Escape the format string but keep the {question} placeholder
             escaped = re.escape(fmt)
@@ -80,7 +86,7 @@ class Agent:
             pattern = escaped.replace(r'\{question\}', r'(.+)')
             return re.compile(f"^{pattern}$")
         
-        # Create patterns from CONFIG formats
+        # create patterns from CONFIG formats
         patterns = {
             question_type.lower(): format_to_regex(fmt)
             for question_type, fmt in CONFIG["Format"]["Question"].items()
@@ -108,6 +114,11 @@ class Agent:
             - pure_question: The question after the first colon
             - question_type: One of 'general', 'factual', or 'embedding'
         """
+        # check if question is plain sparql query
+        q = question.strip().lower()
+        if q.startswith("prefix") or any(k in q for k in ("select", "ask", "construct", "describe")):
+            return question, "sparql"
+
         question = question.lower()
         
         # Determine type based on keywords
@@ -138,13 +149,18 @@ class Agent:
         if q_type == "factual" or q_type == "general":
             # sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
             # results = self.factual.sparql_query(sparql_query) # this should return a list with entities
-            # example format of an answer: 
+            # example format of an answer:
             # "The factual answer is: Ethan Coen and Joel Coen"
             # "The factual answer is: drama film and biographical film and crime film"
 
-            dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
-            result = " and ".join(dummy_results)
-            return f"The factual answer is: {result}"
+            results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
+            
+            if results:
+                result = " and ".join(results)
+                return f"The factual answer is: {result}"
+            else:
+                return "No factual answer found."
+            
         elif q_type == "embedding":
 
             results = self.embeddings.get_best_result(
