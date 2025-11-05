@@ -8,8 +8,9 @@ from factual import Factual
 """
 To run the bot do the following:
 1.  Open terminal
-2.  Run "python agent.py"
-3.  Wait until graph is loaded and the bot is listening (this can take a while)
+2.  Enter "cd Project Submission 2/code"
+3.  Run "python agent.py"
+4.  Wait until graph is loaded and the bot is listening (this can take a while)
 
 
 To test and interact with the bot do the following:
@@ -49,6 +50,7 @@ class Agent:
 
         try:
             reply = self.process_question(message)
+            # print(f"reply: {reply}")
             room.post_messages(reply)
         except Exception as e:
             reply = f"Error processing your query: {e}"
@@ -136,15 +138,19 @@ class Agent:
         relation_label, relation_uri, relation_score, relation_distance = self.extraction.link_relation(relation)
 
         if q_type == "factual" or q_type == "general":
-            # sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
-            # results = self.factual.sparql_query(sparql_query) # this should return a list with entities
-            # example format of an answer: 
+            sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
+            # print(f"sparql_query: {sparql_query}")
+            results = self.factual.sparql_query(sparql_query) # this should return a list with entities
+            formatted_results = self.factual.format_results(results)
+            # print(f"formatted results: {formatted_results}")
+            # label = self.embeddings.ent2lbl(formatted_results, None)
+            # example format of an answer:
             # "The factual answer is: Ethan Coen and Joel Coen"
             # "The factual answer is: drama film and biographical film and crime film"
 
-            dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
-            result = " and ".join(dummy_results)
-            return f"The factual answer is: {result}"
+            #dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
+            #result = " and ".join(dummy_results)
+            return f"The factual answer is: {formatted_results}"
         elif q_type == "embedding":
 
             results = self.embeddings.get_best_result(

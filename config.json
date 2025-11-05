@@ -7,7 +7,7 @@
 
     "Data": {
         "Dataset_URL": "https://files.ifi.uzh.ch/ddis/teaching/2025/ATAI/dataset/",
-        "Directory": "dataset/",
+        "Directory": "/space_mounts/atai-hs25/dataset/",
         "Cache": "cache/",
         "NER": {
             "Dataset": "cache/ner_dataset.csv",
