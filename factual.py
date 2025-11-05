@@ -1,6 +1,7 @@
 import re
 from rdflib import Graph
 import json
+from embeddings import Embeddings
 
 # Configuration
 with open("config.json", "r") as f:
@@ -9,6 +10,7 @@ with open("config.json", "r") as f:
 class Factual():
     def __init__(self):
         self.graph = self.load_graph()
+        self.embeddings = Embeddings()
 
     def load_graph(self):
         graph = Graph()
@@ -20,30 +22,34 @@ class Factual():
     
     def sparql_query(self, query: str):
         results = self.graph.query(query)
+        for row in results:
+            print(row)
         return results
     
     def translate_to_sparql(self, entity_uri: str, relation_uri: str) -> str:
         # Implement here maybe use method "format_results" below?
         # Keep in mind that we might have to handle pure SPARQL queries too
+        qry = None
         if entity_uri and relation_uri:
             qry = f"""
-            SELECT ?object 
+            SELECT ?object ?label
             WHERE {{
-            <{entity_uri}> <{relation_uri}> ?object
+            <{entity_uri}> <{relation_uri}> ?object .
+            OPTIONAL {{
+                ?object rdfs:label ?label .
+                FILTER(LANG(?label) = 'en')
+            }}
             }}
             """
-        else:
-            # If only one argument is given a pure SPARQL query might have been passed
-            qry = entity_uri if entity_uri else relation_uri
-        result = self.sparql_query(qry)
-        return self.format_results(result)
-
-
+            print(f"1. entity: {entity_uri}, relation: {relation_uri}, query {qry}")
+        if not qry:
+            raise ValueError(f"entity: {entity_uri}, relation: {relation_uri}")
+        return qry
     
     # This method is not used in the current code. 
     # It is copied from the first evaluation event. 
     # Ajdust it to return a list of strings with the results (labels).
-    def format_results(self, results) -> list[str]:
+    def format_results(self, results) -> str:
         try:
             if results.type == 'ASK':
                 return "true" if bool(results) else "false"
@@ -55,6 +61,7 @@ class Factual():
                 for i, row in enumerate(results):
                     if i >= 50:
                         lines.append("... (truncated)")
+                        print(row)
                         break
 
                     if hasattr(row, "asdict"):
@@ -77,15 +84,22 @@ class Factual():
                             label = str(b[k])
                             break
 
+                    # this was added to retrieve the label from the already existing ent2lbl
+                    if not label and qid:
+                        uri = f"http://www.wikidata.org/entity/{qid}"
+                        label = self.embeddings.ent2lbl.get(uri, None)
+
                     if qid and label:
                         lines.append(f"{label} ({qid})")
+                    elif label:
+                        lines.append(label)
                     elif qid:
-                        lines.append(qid)
+                        lines.append(f"No label found {qid}")
                     else:
                         pieces = [str(b[v]) for v in vars_ if v in b]
                         lines.append(" | ".join(pieces) if pieces else str(b))
 
-                return "\n".join(lines) if lines else "No results found."
+                return " and ".join(lines) if lines else "No results found."
 
             if results.type in ('CONSTRUCT', 'DESCRIBE'):
                 g = Graph()

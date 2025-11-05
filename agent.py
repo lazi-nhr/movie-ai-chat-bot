@@ -8,8 +8,9 @@ from factual import Factual
 """
 To run the bot do the following:
 1.  Open terminal
-2.  Run "python agent.py"
-3.  Wait until graph is loaded and the bot is listening (this can take a while)
+2.  Enter "cd Project Submission 2/code"
+3.  Run "python agent.py"
+4.  Wait until graph is loaded and the bot is listening (this can take a while)
 
 
 To test and interact with the bot do the following:
@@ -49,6 +50,7 @@ class Agent:
 
         try:
             reply = self.process_question(message)
+            # print(f"reply: {reply}")
             room.post_messages(reply)
         except Exception as e:
             reply = f"Error processing your query: {e}"
@@ -71,14 +73,8 @@ class Agent:
         Returns:
             tuple[str, str]: (pure_question, question_type)
             - pure_question: The question without the format prefix
-            - question_type: One of 'sparql', 'general', 'factual', or 'embedding'
+            - question_type: One of 'general', 'factual', or 'embedding'
         """
-        # check if question is plain sparql query
-        q = question.strip().lower()
-        if q.startswith("prefix") or any(k in q for k in ("select", "ask", "construct", "describe")):
-            return question, "sparql"
-
-        # convert CONFIG formats to regex patterns
         def format_to_regex(fmt: str) -> re.Pattern:
             # Escape the format string but keep the {question} placeholder
             escaped = re.escape(fmt)
@@ -86,7 +82,7 @@ class Agent:
             pattern = escaped.replace(r'\{question\}', r'(.+)')
             return re.compile(f"^{pattern}$")
         
-        # create patterns from CONFIG formats
+        # Create patterns from CONFIG formats
         patterns = {
             question_type.lower(): format_to_regex(fmt)
             for question_type, fmt in CONFIG["Format"]["Question"].items()
@@ -114,11 +110,6 @@ class Agent:
             - pure_question: The question after the first colon
             - question_type: One of 'general', 'factual', or 'embedding'
         """
-        # check if question is plain sparql query
-        q = question.strip().lower()
-        if q.startswith("prefix") or any(k in q for k in ("select", "ask", "construct", "describe")):
-            return question, "sparql"
-
         question = question.lower()
         
         # Determine type based on keywords
@@ -147,20 +138,19 @@ class Agent:
         relation_label, relation_uri, relation_score, relation_distance = self.extraction.link_relation(relation)
 
         if q_type == "factual" or q_type == "general":
-            # sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
-            # results = self.factual.sparql_query(sparql_query) # this should return a list with entities
+            sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
+            # print(f"sparql_query: {sparql_query}")
+            results = self.factual.sparql_query(sparql_query) # this should return a list with entities
+            formatted_results = self.factual.format_results(results)
+            # print(f"formatted results: {formatted_results}")
+            # label = self.embeddings.ent2lbl(formatted_results, None)
             # example format of an answer:
             # "The factual answer is: Ethan Coen and Joel Coen"
             # "The factual answer is: drama film and biographical film and crime film"
 
-            results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
-            
-            if results:
-                result = " and ".join(results)
-                return f"The factual answer is: {result}"
-            else:
-                return "No factual answer found."
-            
+            #dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
+            #result = " and ".join(dummy_results)
+            return f"The factual answer is: {formatted_results}"
         elif q_type == "embedding":
 
             results = self.embeddings.get_best_result(
