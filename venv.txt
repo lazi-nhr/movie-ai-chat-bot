@@ -1,0 +1,8 @@
+1. create new environment with specified python version
+/opt/homebrew/bin/python3.11 -m venv ~/venvs/stableML
+
+2. activate virtual environment
+source ~/venvs/stableML/bin/activate
+
+3. deactivate virtual environment
+~/venvs/stableML/bin/activate
