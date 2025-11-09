@@ -62,7 +62,7 @@ class Agent:
         room.post_messages(f"Thanks for your reaction: '{reaction}'")
 
     @staticmethod
-    def classify_question(question: str) -> tuple[str, str]:
+    def classify_question_ev2(question: str) -> tuple[str, str]:
         """
         Classifies a question into one of three types (general, factual, or embedding)
         and extracts the pure question without the format prefix.
@@ -98,7 +98,7 @@ class Agent:
         return question, "general"
     
     @staticmethod
-    def classify_question_simple(question: str) -> tuple[str, str]:
+    def classify_question(question: str) -> tuple[str, str]:
         """
         A simpler version of question classification that looks for keywords and splits on ':'
         
@@ -112,8 +112,14 @@ class Agent:
         """
         question = question.lower()
         
-        # Determine type based on keywords
-        if "factual" in question:
+        # check for SPARQL query indicators
+        if question.startswith("prefix") or any(k in question for k in ("select", "ask", "construct", "describe")):
+            return question, "sparql"
+        
+        # check for keywords
+        elif "recommend" in question:
+            question_type = "recommendation"
+        elif "factual" in question:
             question_type = "factual"
         elif "embedding" in question:
             question_type = "embedding"
@@ -151,6 +157,12 @@ class Agent:
             #dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
             #result = " and ".join(dummy_results)
             return f"The factual answer is: {formatted_results}"
+        
+        if q_type == "sparql":
+            results = self.factual.sparql_query(pure_q)
+            formatted_results = self.factual.format_results(results)
+            return f"The SPARQL query result is: {formatted_results}"
+        
         elif q_type == "embedding":
 
             results = self.embeddings.get_best_result(
