@@ -1,11 +1,8 @@
 import re
 from rdflib import Graph
-import json
 from embeddings import Embeddings
+from config import CONFIG
 
-# Configuration
-with open("config.json", "r") as f:
-    CONFIG = json.load(f)
 
 class Factual():
     def __init__(self):

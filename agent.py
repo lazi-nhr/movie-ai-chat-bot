@@ -4,6 +4,8 @@ from speakeasypy import Chatroom, EventType, Speakeasy
 from extraction import Extraction
 from embeddings import Embeddings
 from factual import Factual
+from config import CONFIG
+
 
 """
 To run the bot do the following:
@@ -21,10 +23,6 @@ To test and interact with the bot do the following:
 4.  Click on "Request Chat"
 5.  Enter "CyanPeekingMouse" and click on "Request"
 """
-
-# a configuration dictionary facilitates administration of the code
-with open("config.json", "r") as f:
-    CONFIG = json.load(f)
 
 class Agent:
     def __init__(self):

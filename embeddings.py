@@ -3,10 +3,8 @@ import os
 from rdflib import Graph
 from sklearn.metrics import pairwise_distances
 import json
+from config import CONFIG
 
-# Configuration
-with open("config.json", "r") as f:
-    CONFIG = json.load(f)
 
 class Embeddings():
     def __init__(self):

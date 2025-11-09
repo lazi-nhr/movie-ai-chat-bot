@@ -1,4 +1,4 @@
-{
+CONFIG = {
     "Hosting": {
         "URL": "https://speakeasy.ifi.uzh.ch",
         "Username": "CyanPeekingMouse",

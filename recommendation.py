@@ -12,12 +12,8 @@ from surprise.model_selection.split import train_test_split
 
 from sklearn.metrics.pairwise import cosine_similarity
 
+from config import CONFIG
 
-# Get the directory where this script is located
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.json")
-with open(CONFIG_PATH, "r") as f:
-    CONFIG = json.load(f)
 
 class Recommendation():
 

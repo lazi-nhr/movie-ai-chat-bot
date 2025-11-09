@@ -8,12 +8,8 @@ import sklearn_crfsuite
 
 from sklearn.model_selection import train_test_split
 
-# Install packages
-#!pip -q install -U editdistance rdflib pandas numpy scikit-learn sklearn-crfsuite
+from config import CONFIG
 
-# Configuration
-with open("config.json", "r") as f:
-    CONFIG = json.load(f)
 
 class CRF():
     def __init__(self):
