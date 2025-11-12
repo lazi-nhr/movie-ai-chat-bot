@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import numpy as np
@@ -15,18 +14,19 @@ from sklearn.metrics.pairwise import cosine_similarity
 from config import CONFIG
 
 
+# virtual environment necessary: python 3.11.14
 class Recommendation():
 
     def __init__(self):
-        self.svd_algo, self.trainset = self.load_svd()
-        self.title_to_id, self.id_to_title = self.load_title_maps()
+        self.svd_algo, self.trainset = self.load_svd() # train and load SVD model
+        self.title_to_id, self.id_to_title = self.load_title_maps() # load title mappings
 
     def load_svd(self):
-        data = Dataset.load_builtin('ml-100k')
+        data = Dataset.load_builtin('ml-100k') # load MovieLens 100k dataset
         # format: (user id, movie id, rating)
-        trainset, _ = train_test_split(data, test_size=.01, random_state=42) # no need for test (.0)
+        trainset, _ = train_test_split(data, test_size=.01, random_state=42)
         svd_algo = SVD(random_state = 42)
-        svd_algo.fit(trainset)
+        svd_algo.fit(trainset) # train
         return svd_algo, trainset
     
     def load_title_maps(self, u_item_path=None):
@@ -68,10 +68,6 @@ class Recommendation():
         title_to_id: dict mapping official titles to raw ids
         """
         surface = surface.lower()
-        # partial match
-        for title, id in self.title_to_id.items():
-            if surface in title.lower():
-                return id, title
 
         # lowest edit distance match
         best_title = None
@@ -89,13 +85,12 @@ class Recommendation():
             return None, None
         return best_id, best_title
     
-
+    # add filter: include only same genres, year range +- 5 years
     def recommend_from_titles(
         self,
         titles,
         top_n=10,
-        per_item_pool=500,
-        exclude_input=True
+        per_item_pool=500
     ):
         """
         titles: list of movie titles (strings)
@@ -105,19 +100,19 @@ class Recommendation():
         """
         # get item-factor matrix (inner-item-id order)
         Q = self.svd_algo.qi  # shape: [n_items, n_factors]
-        n_items = Q.shape[0]
+        n_items = Q.shape[0] # total number of movies
 
         # map input titles -> inner ids
         liked_inner_ids = []
         missing = []
-        for t in titles:
-            raw_iid, t = self.link_title(t)
+        for title in titles:
+            raw_iid, t = self.link_title(title)
             if raw_iid is None:
-                missing.append(t)
+                missing.append(title)
                 continue
             try:
-                inner_id = self.trainset.to_inner_iid(raw_iid)
-                liked_inner_ids.append(inner_id)
+                inner_id = self.trainset.to_inner_iid(raw_iid) # get inner id
+                liked_inner_ids.append(inner_id) # collect inner ids
             except ValueError:
                 # item not in trainset (rare in ML-100k if using full data)
                 missing.append(t)
@@ -132,28 +127,27 @@ class Recommendation():
         # compute aggregated similarity scores
         agg_scores = np.zeros(n_items, dtype=np.float64)
         for inner_id in liked_inner_ids:
-            v = Q[inner_id].reshape(1, -1)
-            sims = cosine_similarity(v, Q).ravel()
-            sims[inner_id] = 0.0  # don’t recommend the exact same item
+            v = Q[inner_id].reshape(1, -1) # get row of movie, reshape to 2D array -> extract latenet vector, 
+            sims = cosine_similarity(v, Q).ravel() # compute cosine similarity against all items
+            sims[inner_id] = 0.0  # don’t recommend the exact same item (self-similarity = 0)
             # optionally keep only the strongest neighbors per seed to reduce noise
-            if per_item_pool and per_item_pool < n_items:
-                top_idx = np.argpartition(-sims, per_item_pool)[:per_item_pool]
-                pruned = np.zeros_like(sims)
-                pruned[top_idx] = sims[top_idx]
-                sims = pruned
-            agg_scores += sims
+            if per_item_pool and per_item_pool < n_items: # prune weak similarites if enabled
+                top_idx = np.argpartition(-sims, per_item_pool)[:per_item_pool] # get top movie indices by similarity
+                pruned = np.zeros_like(sims) # array of zeros, same size as sims
+                pruned[top_idx] = sims[top_idx] # keep only top similarities
+                sims = pruned # replace sims with pruned version
+            agg_scores += sims # aggregate scores for all liked items
 
-        # exclude the input movies, if desired
-        if exclude_input:
-            agg_scores[liked_inner_ids] = -np.inf
+        # exclude the input movies
+        agg_scores[liked_inner_ids] = -np.inf
 
         # rank and build output
-        top_inner = np.argsort(-agg_scores)[:top_n]
+        top_inner = np.argsort(-agg_scores)[:top_n] # get top-n inner ids by descending order (-)
         recs = []
         for iid in top_inner:
-            raw_iid = self.trainset.to_raw_iid(iid)
-            title = self.id_to_title.get(raw_iid, f"[item {raw_iid}]")
-            score = agg_scores[iid]
+            raw_iid = self.trainset.to_raw_iid(iid) # convert back to raw id
+            title = self.id_to_title.get(raw_iid, f"[item {raw_iid}]") # get title
+            score = agg_scores[iid] # get score
             recs.append({"movie_id": raw_iid, "title": title, "score": float(score)})
 
         return {
@@ -164,6 +158,6 @@ class Recommendation():
 
 # --- usage example ---
 rec = Recommendation()
-movies = ["Nightmare on Elm Street", "Friday the 13th", "Halloween"]
+movies = ["The Lion King", "Pocahontas", "The Beauty and the Beast"]
 result = rec.recommend_from_titles(movies, top_n=3)
 print(result)

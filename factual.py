@@ -19,8 +19,6 @@ class Factual():
     
     def sparql_query(self, query: str):
         results = self.graph.query(query)
-        for row in results:
-            print(row)
         return results
     
     def translate_to_sparql(self, entity_uri: str, relation_uri: str) -> str:
@@ -46,7 +44,7 @@ class Factual():
     # This method is not used in the current code. 
     # It is copied from the first evaluation event. 
     # Ajdust it to return a list of strings with the results (labels).
-    def format_results(self, results) -> str:
+    def get_labels(self, results) -> str:
         try:
             if results.type == 'ASK':
                 return "true" if bool(results) else "false"

@@ -143,22 +143,13 @@ class Agent:
 
         if q_type == "factual" or q_type == "general":
             sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
-            # print(f"sparql_query: {sparql_query}")
             results = self.factual.sparql_query(sparql_query) # this should return a list with entities
-            formatted_results = self.factual.format_results(results)
-            # print(f"formatted results: {formatted_results}")
-            # label = self.embeddings.ent2lbl(formatted_results, None)
-            # example format of an answer:
-            # "The factual answer is: Ethan Coen and Joel Coen"
-            # "The factual answer is: drama film and biographical film and crime film"
-
-            #dummy_results = ["Ethan Coen", "Joel Coen"]  # Placeholder for actual results
-            #result = " and ".join(dummy_results)
+            formatted_results = self.factual.get_labels(results)
             return f"The factual answer is: {formatted_results}"
         
         if q_type == "sparql":
             results = self.factual.sparql_query(pure_q)
-            formatted_results = self.factual.format_results(results)
+            formatted_results = self.factual.get_labels(results)
             return f"The SPARQL query result is: {formatted_results}"
         
         elif q_type == "embedding":
