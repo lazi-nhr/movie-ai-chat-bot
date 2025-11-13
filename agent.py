@@ -145,12 +145,12 @@ class Agent:
             sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
             results = self.factual.sparql_query(sparql_query) # this should return a list with entities
             formatted_results = self.factual.get_labels(results)
-            return f"The factual answer is: {formatted_results}"
+            return f"The answer is: {formatted_results}"
         
         if q_type == "sparql":
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
-            return f"The SPARQL query result is: {formatted_results}"
+            return f"The result is: {formatted_results}"
         
         elif q_type == "embedding":
 
