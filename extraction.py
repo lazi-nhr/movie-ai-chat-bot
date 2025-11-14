@@ -15,7 +15,7 @@ class CRF():
     def __init__(self):
         self.crf_path = CONFIG["Data"]["NER"]["Model"]
         self.ner_path = CONFIG["Data"]["NER"]["Dataset"]
-        #self.crf = self.load_crf()
+        self.crf = self.load_crf()
 
     # Load named enttity recognition (NER) training data
     def load_crf(self):
@@ -118,7 +118,7 @@ class Extraction(CRF):
         super().__init__()
         self.separators = CONFIG["Format"]["Question"]["Seperators"]
 
-    def extract_entity(
+    def extract_entity_simple(
             self,
             question: str
             ) -> str | None:
@@ -149,7 +149,7 @@ class Extraction(CRF):
         return question[start_quote + 1:end_quote-1]
     
     # Implement NER method to extract the entity from the question
-    def extract_entity_crf(
+    def extract_entity(
             self, 
             question: str
             ) -> str | None:
@@ -207,6 +207,97 @@ class Extraction(CRF):
         #print("NER Tags:", tags)
         
         return result
+
+    def extract_entities(
+            self, 
+            question: str
+            ) -> list[str]:
+        """
+        Extract multiple entities from a question string.
+        Handles lists of entities separated by commas, 'and', 'or', etc.
+        
+        Args:
+            question (str): The input question containing multiple entities
+            
+        Returns:
+            list[str]: A list of extracted entities
+            
+        Example:
+            >>> extract_entities("Recommend movies like Nightmare on Elm Street, Friday the 13th, and Halloween.")
+            ['Nightmare on Elm Street', 'Friday the 13th', 'Halloween']
+        """
+        # Convert question into the format expected by the CRF model
+        question = question[0].lower() + question[1:] # make first letter of question lowercase
+        # remove any marking punctuation at the end
+        question = question.rstrip('?!.')
+        
+        words = question.split() # split into words
+        
+        # Assign more specific POS tags based on capitalization and position
+        pos_tags = []
+        for i, word in enumerate(words):
+            # Clean word from punctuation for checking but keep original for tagging
+            clean_word = word.rstrip(',.;:')
+            if clean_word.istitle() or clean_word.isupper() or clean_word.isdigit():
+                pos_tags.append('NNP')  # Proper noun
+            elif word.lower() in ['who', 'what', 'where', 'when', 'why', 'how']:
+                pos_tags.append('WP')  # Wh-pronoun
+            elif word.lower() in ['is', 'are', 'was', 'were']:
+                pos_tags.append('VBZ')  # Verb
+            elif word.lower() in ['the', 'a', 'an']:
+                pos_tags.append('DT')  # Determiner
+            elif word.lower() in ['of', 'in', 'by', 'with']:
+                pos_tags.append('IN')  # Preposition
+            else:
+                pos_tags.append('NN')  # Common noun
+        
+        # Create sentence structure with dummy third element to match training data format
+        sentence = [(word, pos, 'O') for word, pos in zip(words, pos_tags)]
+        
+        # Extract features
+        X = [self.word2features(sentence, i) for i in range(len(sentence))]
+        
+        # Predict tags
+        tags = self.crf.predict([X])[0]
+        
+        # Extract multiple entities
+        entities = []
+        current_entity = []
+        in_entity = False
+        
+        for word, tag in zip(words, tags):
+            # Clean word from trailing punctuation for entity extraction
+            clean_word = word.rstrip(',.;:')
+            
+            if tag.startswith('B-'):  # Beginning of entity
+                if current_entity:  # Store previous entity if exists
+                    entity_text = ' '.join(current_entity).strip()
+                    if entity_text:
+                        entities.append(entity_text)
+                current_entity = [clean_word]
+                in_entity = True
+            elif tag.startswith('I-') and in_entity:  # Inside of entity
+                current_entity.append(clean_word)
+            else:  # Outside of entity
+                if current_entity and in_entity:
+                    entity_text = ' '.join(current_entity).strip()
+                    if entity_text:
+                        entities.append(entity_text)
+                    current_entity = []
+                in_entity = False
+        
+        # Don't forget the last entity if sentence ends with one
+        if current_entity and in_entity:
+            entity_text = ' '.join(current_entity).strip()
+            if entity_text:
+                entities.append(entity_text)
+        
+        # Debug information
+        #print("Words:", words)
+        #print("NER Tags:", tags)
+        #print("Extracted entities:", entities)
+        
+        return entities
 
     @staticmethod
     def link_entity(

@@ -9,6 +9,10 @@ from config import CONFIG
 
 
 """
+To install all packages run this in the Terminal once:
+pip install "numpy<2" scikit-surprise
+pip install pandas editdistance rdflib joblib scikit-learn sklearn-crfsuite
+
 To run the bot do the following:
 1.  Open terminal
 2.  Enter "conda activate recommendation" to run on python 3.11.14 which is necessary for the suprise library
@@ -51,7 +55,7 @@ class Agent:
 
         try:
             reply = self.process_question(message)
-            # print(f"reply: {reply}")
+            print(f"Final reply: {reply}")
             room.post_messages(reply)
         except Exception as e:
             reply = f"Error processing your query: {e}"
@@ -137,6 +141,7 @@ class Agent:
     
     def process_question(self, question: str) -> str:
         pure_q, q_type = self.classify_question(question)
+        print(f"Classified  as type '{q_type}'.")
 
         entity = self.extraction.extract_entity(pure_q)
         entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
@@ -145,22 +150,29 @@ class Agent:
         relation_label, relation_uri, relation_score, relation_distance = self.extraction.link_relation(relation)
 
         if q_type == "factual" or q_type == "general":
+            print(f"Identified entity: {entity_label}.")
+            print(f"Identified relation: {relation_label}.")
             sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
             results = self.factual.sparql_query(sparql_query) # this should return a list with entities
             formatted_results = self.factual.get_labels(results)
             return f"The answer is: {formatted_results}"
         
         elif q_type == "sparql":
+            print(f"Identified entity: {entity_label}.")
+            print(f"Identified relation: {relation_label}.")
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
             return f"The result is: {formatted_results}"
 
         elif q_type == "recommendation":
-            movie_list = ["Nightmare on Elm Street", "Friday the 13th", "Halloween"] # extraction here
+            movie_list = self.extraction.extract_entities(pure_q)
+            print(f"Identified movies: {movie_list}.")
             movies = self.recommendation.recommend_from_titles(movie_list)
             return " and ".join(movies) if movies else "No results found."
         
         elif q_type == "embedding":
+            print(f"Identified entity: {entity_label}.")
+            print(f"Identified relation: {relation_label}.")
 
             results = self.embeddings.get_best_result(
                 entity_uri, 
