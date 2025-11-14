@@ -4,12 +4,14 @@ from speakeasypy import Chatroom, EventType, Speakeasy
 from extraction import Extraction
 from embeddings import Embeddings
 from factual import Factual
+from recommendation import Recommendation
 from config import CONFIG
 
 
 """
 To run the bot do the following:
 1.  Open terminal
+2.  Enter "conda activate recommendation" to run on python 3.11.14 which is necessary for the suprise library
 2.  Enter "cd Project Submission 2/code"
 3.  Run "python agent.py"
 4.  Wait until graph is loaded and the bot is listening (this can take a while)
@@ -33,6 +35,7 @@ class Agent:
         self.extraction = Extraction()
         self.embeddings = Embeddings()
         self.factual = Factual()
+        self.recommendation = Recommendation()
 
         self.speakeasy = Speakeasy(host=self.url, username=self.username, password=self.password)
         self.speakeasy.login()
@@ -147,10 +150,15 @@ class Agent:
             formatted_results = self.factual.get_labels(results)
             return f"The answer is: {formatted_results}"
         
-        if q_type == "sparql":
+        elif q_type == "sparql":
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
             return f"The result is: {formatted_results}"
+
+        elif q_type == "recommendation":
+            movie_list = ["Nightmare on Elm Street", "Friday the 13th", "Halloween"] # extraction here
+            movies = self.recommendation.recommend_from_titles(movie_list)
+            return " and ".join(movies) if movies else "No results found."
         
         elif q_type == "embedding":
 
