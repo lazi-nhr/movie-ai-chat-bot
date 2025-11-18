@@ -51,7 +51,9 @@ class Agent:
         self.speakeasy.start_listening()
 
     def on_new_message(self, message: str, room: Chatroom):
-        print(f"New message in room {room.room_id}: {message}")
+        # print(f"New message in room {room.room_id}: {message}")
+        print("\n")
+        print(f"New message: {message}")
 
         try:
             reply = self.process_question(message)
@@ -61,6 +63,8 @@ class Agent:
             reply = f"Error processing your query: {e}"
             print(f"on {room.room_id}: {reply}")
             room.post_messages(reply)
+        
+        print("\n")
 
     def on_new_reaction(self, reaction: str, message_ordinal: int, room: Chatroom):
         print(f"New reaction '{reaction}' on message #{message_ordinal} in room {room.room_id}")
@@ -167,8 +171,11 @@ class Agent:
         elif q_type == "recommendation":
             movie_list = self.extraction.extract_entities(pure_q)
             print(f"Identified movies: {movie_list}.")
-            movies = self.recommendation.recommend_from_titles(movie_list)
-            return " and ".join(movies) if movies else "No results found."
+            movies = self.recommendation.recommend_from_titles(movie_list, top_n=CONFIG["Recommendation"]["top_n"])
+            recs = []
+            for recommendation in movies["recommendations"]:
+                recs.append(recommendation["title"])
+            return " and ".join(recs) if recs else "No results found."
         
         elif q_type == "embedding":
             print(f"Identified entity: {entity_label}.")

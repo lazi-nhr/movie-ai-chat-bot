@@ -208,13 +208,127 @@ class Extraction(CRF):
         
         return result
 
+    def extract_entities_rule_based(
+            self,
+            question: str
+            ) -> list[str]:
+        """
+        Rule-based entity extraction specifically for movie titles.
+        This complements the CRF-based approach with domain-specific patterns.
+        """
+        # Common trigger phrases that precede movie lists
+        triggers = ['like', 'similar to', 'such as', 'including', 'e.g.', 'for example']
+        
+        question_lower = question.lower()
+        
+        # Find where the movie list starts
+        start_idx = -1
+        for trigger in triggers:
+            idx = question_lower.find(trigger)
+            if idx != -1:
+                start_idx = idx + len(trigger)
+                break
+        
+        # Also check for patterns like "Given that I like..."
+        if start_idx == -1:
+            if 'i like' in question_lower:
+                start_idx = question_lower.find('i like') + len('i like')
+        
+        if start_idx == -1:
+            return []
+        
+        # Extract the portion containing movie titles
+        movie_portion = question[start_idx:].strip()
+        
+        # Remove trailing question words
+        for ending in [', can you recommend', 'can you recommend', ', recommend', 'recommend']:
+            if ending in movie_portion.lower():
+                movie_portion = movie_portion[:movie_portion.lower().find(ending)]
+                break
+        
+        # Strategy: handle two different list formats
+        # Format 1: "Title1, Title2, and Title3" (with commas)
+        # Format 2: "Title1 and Title2" (without commas, just "and")
+        
+        # Check if there are commas - if so, use comma-based splitting
+        if ',' in movie_portion:
+            # Replace ", and" and ", or" with just comma for easier processing
+            movie_portion = movie_portion.replace(', and ', ', ').replace(', or ', ', ')
+            
+            # Split by commas
+            raw_parts = [p.strip() for p in movie_portion.split(',')]
+        else:
+            # No commas - split by " and " or " or "
+            # First mark the separators
+            movie_portion = movie_portion.replace(' and ', '|||').replace(' or ', '|||')
+            raw_parts = [p.strip() for p in movie_portion.split('|||')]
+        
+        # Now merge parts that should be together using smarter logic
+        merged_parts = []
+        i = 0
+        while i < len(raw_parts):
+            part = raw_parts[i].strip()
+            
+            # Remove leading "and"
+            part_lower = part.lower()
+            if part_lower.startswith('and '):
+                part = part[4:].strip()
+                part_lower = part.lower()
+            
+            # Check if this looks like a continuation
+            # A part is a continuation if:
+            # 1. It starts with an article followed by a single lowercase word, OR
+            # 2. It starts with a lowercase word (not a complete title)
+            # BUT NOT if the previous part looks complete (has capitals)
+            is_continuation = False
+            
+            if i > 0 and merged_parts:
+                # Pattern: "the Beast" after "Beauty" should merge
+                # Pattern: "Pocahontas" after "Lion King" should NOT merge
+                
+                # Check if current part starts with article + likely continuation
+                if part_lower.startswith('the ') or part_lower.startswith('a ') or part_lower.startswith('an '):
+                    words_after_article = part.split()[1:] if len(part.split()) > 1 else []
+                    # If there's only one word after article and it starts with capital or lowercase, likely continuation
+                    if len(words_after_article) == 1:
+                        is_continuation = True
+                    # If multiple words and they continue a pattern (e.g., "the Beast")
+                    elif len(words_after_article) > 0 and not words_after_article[0][0].isupper():
+                        # Lowercase after article suggests continuation
+                        is_continuation = True
+            
+            if is_continuation:
+                # Merge with previous part
+                merged_parts[-1] = merged_parts[-1] + ' and ' + part
+            else:
+                merged_parts.append(part)
+            
+            i += 1
+        
+        # Clean and filter
+        entities = []
+        for entity in merged_parts:
+            entity = entity.strip().rstrip('.,;:?!')
+            
+            # Remove leading "and" or "or" if still present
+            entity = entity.strip()
+            while entity.lower().startswith('and '):
+                entity = entity[4:].strip()
+            while entity.lower().startswith('or '):
+                entity = entity[3:].strip()
+                
+            if entity and len(entity) > 1:  # Avoid single letters or empty
+                entities.append(entity)
+        
+        return entities
+
     def extract_entities(
-            self, 
+            self,
             question: str
             ) -> list[str]:
         """
         Extract multiple entities from a question string.
-        Handles lists of entities separated by commas, 'and', 'or', etc.
+        Combines rule-based and CRF-based approaches for better accuracy.
         
         Args:
             question (str): The input question containing multiple entities
@@ -226,6 +340,9 @@ class Extraction(CRF):
             >>> extract_entities("Recommend movies like Nightmare on Elm Street, Friday the 13th, and Halloween.")
             ['Nightmare on Elm Street', 'Friday the 13th', 'Halloween']
         """
+        # First try rule-based approach
+        rule_based_entities = self.extract_entities_rule_based(question)
+        
         # Convert question into the format expected by the CRF model
         question = question[0].lower() + question[1:] # make first letter of question lowercase
         # remove any marking punctuation at the end
@@ -238,18 +355,39 @@ class Extraction(CRF):
         for i, word in enumerate(words):
             # Clean word from punctuation for checking but keep original for tagging
             clean_word = word.rstrip(',.;:')
-            if clean_word.istitle() or clean_word.isupper() or clean_word.isdigit():
-                pos_tags.append('NNP')  # Proper noun
-            elif word.lower() in ['who', 'what', 'where', 'when', 'why', 'how']:
+            
+            # Check if this might be part of a title (capitalized or following article)
+            prev_word = words[i-1].lower().rstrip(',.;:') if i > 0 else ''
+            next_word = words[i+1].lower().rstrip(',.;:') if i < len(words)-1 else ''
+            
+            if word.lower() in ['who', 'what', 'where', 'when', 'why', 'how']:
                 pos_tags.append('WP')  # Wh-pronoun
-            elif word.lower() in ['is', 'are', 'was', 'were']:
+            elif word.lower() in ['is', 'are', 'was', 'were', 'can', 'could', 'should', 'would']:
                 pos_tags.append('VBZ')  # Verb
             elif word.lower() in ['the', 'a', 'an']:
-                pos_tags.append('DT')  # Determiner
-            elif word.lower() in ['of', 'in', 'by', 'with']:
-                pos_tags.append('IN')  # Preposition
+                # Check if article is likely part of a title (followed by capitalized word)
+                if i < len(words) - 1 and words[i+1].rstrip(',.;:')[0].isupper():
+                    pos_tags.append('DT-TITLE')  # Determiner in title
+                else:
+                    pos_tags.append('DT')  # Regular determiner
+            elif word.lower() in ['of', 'in', 'by', 'with', 'on', 'at', 'to', 'for', 'from']:
+                # Prepositions can be part of titles
+                if prev_word in ['the', 'a', 'an'] or (i > 0 and words[i-1].rstrip(',.;:')[0].isupper()):
+                    pos_tags.append('IN-TITLE')  # Preposition in title
+                else:
+                    pos_tags.append('IN')  # Regular preposition
+            elif clean_word.istitle() or clean_word.isupper() or clean_word.isdigit():
+                pos_tags.append('NNP')  # Proper noun
+            elif word.lower() in ['and', 'or']:
+                pos_tags.append('CC')  # Coordinating conjunction
+            elif word.lower() in ['like', 'similar', 'recommend', 'given', 'such']:
+                pos_tags.append('JJ')  # Adjective/keyword
             else:
-                pos_tags.append('NN')  # Common noun
+                # Check if lowercase word might be part of a title
+                if prev_word in ['the', 'a', 'an'] or (i > 0 and words[i-1].rstrip(',.;:')[0].isupper()):
+                    pos_tags.append('NN-TITLE')  # Common noun in title
+                else:
+                    pos_tags.append('NN')  # Common noun
         
         # Create sentence structure with dummy third element to match training data format
         sentence = [(word, pos, 'O') for word, pos in zip(words, pos_tags)]
@@ -260,44 +398,102 @@ class Extraction(CRF):
         # Predict tags
         tags = self.crf.predict([X])[0]
         
-        # Extract multiple entities
+        # Extract multiple entities with improved handling
         entities = []
         current_entity = []
         in_entity = False
         
-        for word, tag in zip(words, tags):
+        for i, (word, tag, pos) in enumerate(zip(words, tags, pos_tags)):
             # Clean word from trailing punctuation for entity extraction
             clean_word = word.rstrip(',.;:')
+            word_lower = clean_word.lower()
             
+            # Skip connector words between entities
+            if word_lower in ['and', 'or', ','] and not in_entity:
+                continue
+                
             if tag.startswith('B-'):  # Beginning of entity
                 if current_entity:  # Store previous entity if exists
                     entity_text = ' '.join(current_entity).strip()
-                    if entity_text:
+                    if entity_text and entity_text.lower() not in ['i', 'like', 'given', 'that']:
                         entities.append(entity_text)
                 current_entity = [clean_word]
                 in_entity = True
             elif tag.startswith('I-') and in_entity:  # Inside of entity
                 current_entity.append(clean_word)
-            else:  # Outside of entity
-                if current_entity and in_entity:
+            elif in_entity:
+                # Check if this is an article or preposition that might be part of a title
+                if word_lower in ['the', 'a', 'an', 'of', 'on', 'in', 'and']:
+                    # Look ahead to see if there's more capitalized words
+                    if i < len(words) - 1:
+                        next_word = words[i+1].rstrip(',.;:')
+                        if next_word and next_word[0].isupper():
+                            # This article/preposition is likely part of the title
+                            current_entity.append(clean_word)
+                            continue
+                
+                # End of entity
+                if current_entity:
                     entity_text = ' '.join(current_entity).strip()
-                    if entity_text:
+                    # Filter out common false positives
+                    if entity_text and entity_text.lower() not in ['i', 'like', 'given', 'that', 'and', 'or']:
                         entities.append(entity_text)
                     current_entity = []
                 in_entity = False
+            else:  # Outside of entity
+                # Check if this is a capitalized word that might start an entity
+                # This catches cases where the CRF missed an entity
+                if clean_word and clean_word[0].isupper() and word_lower not in ['i']:
+                    # Look for sequences of capitalized words
+                    if i < len(words) - 1:
+                        next_word = words[i+1].rstrip(',.;:')
+                        if next_word and (next_word[0].isupper() or next_word.lower() in ['the', 'of', 'on', 'in', 'and']):
+                            current_entity = [clean_word]
+                            in_entity = True
         
         # Don't forget the last entity if sentence ends with one
         if current_entity and in_entity:
             entity_text = ' '.join(current_entity).strip()
-            if entity_text:
+            if entity_text and entity_text.lower() not in ['i', 'like', 'given', 'that', 'and', 'or']:
                 entities.append(entity_text)
         
         # Debug information
         #print("Words:", words)
         #print("NER Tags:", tags)
-        #print("Extracted entities:", entities)
+        #print("Extracted entities before refinement:", entities)
         
-        return entities
+        # If rule-based extraction worked and looks good, prefer it
+        if rule_based_entities and len(rule_based_entities) > 0:
+            # Validate each entity through linking
+            validated_entities = []
+            for entity in rule_based_entities:
+                linked_label, uri, score, distance = self.link_entity(entity)
+                # If we found a good match, use the canonical label; otherwise keep original
+                if linked_label and score and score > 0.6:
+                    validated_entities.append(linked_label)
+                else:
+                    validated_entities.append(entity)
+            
+            # If validation was successful, use rule-based results
+            if validated_entities:
+                #print("Using rule-based extraction:", validated_entities)
+                return validated_entities
+        
+        # Otherwise, post-process CRF entities: try to improve entities using entity linking
+        refined_entities = []
+        for entity in entities:
+            # Try linking to see if we can find a better match
+            linked_label, uri, score, distance = self.link_entity(entity)
+            
+            # If we found a very close match, use the canonical label
+            if linked_label and score and score > 0.8:
+                refined_entities.append(linked_label)
+            else:
+                # Keep original extraction
+                refined_entities.append(entity)
+        
+        #print("Refined entities:", refined_entities)
+        return refined_entities
 
     @staticmethod
     def link_entity(

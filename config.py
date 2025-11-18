@@ -29,6 +29,9 @@ CONFIG = {
         "Answer": {
             "Factual": "The factual answer is: {answer}",
             "Embedding": "The answer suggested by embeddings is: {entity_label} (type: {type_qid})"
+        },
+        "Recommendation": {
+            "top_n": 5
         }
     }
 }
