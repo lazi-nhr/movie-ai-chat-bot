@@ -19,6 +19,7 @@ class Factual():
     
     def sparql_query(self, query: str):
         results = self.graph.query(query)
+        print(results)
         return results
     
     def translate_to_sparql(self, entity_uri: str, relation_uri: str) -> str:

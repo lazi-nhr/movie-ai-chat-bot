@@ -1,5 +1,7 @@
 import os
 import re
+import math
+from typing import List, Dict, Any, Set
 import numpy as np
 import pandas as pd
 
@@ -90,7 +92,7 @@ class Recommendation():
     def recommend_from_titles(
         self,
         titles,
-        top_n=5,
+        top_n=20,
         per_item_pool=500
     ):
         """
@@ -156,11 +158,12 @@ class Recommendation():
             "recommendations": recs      # ranked list
         }
 
-    def filter_recommendations(self, titles, recommendations, year_window=5, max_genre_deviation=1, u_item_path=None):
+    def filter_recommendations(self, titles, recommendations, year_window=5, final_limit: int = 5, u_item_path=None):
         """
         titles: list of strings (user input)
         recommendations: list of dicts produced by recommend_from_titles
         year_window: e.g. 10 → only keep movies within ±10 years
+        final_limit: The maximum number of final recommendations to return.
         """
         # load metadata from u.item
         default_path = os.path.expanduser("~/.surprise_data/ml-100k/ml-100k/u.item")
@@ -174,9 +177,9 @@ class Recommendation():
         ]
 
         df = pd.read_csv(
-        path, sep='|', header=None, encoding='latin-1',
-        usecols=[0, 1, 2] + list(range(5, 24)),
-        names=['movie_id', 'title', 'release_date'] + genre_cols
+            path, sep='|', header=None, encoding='latin-1',
+            usecols=[0, 1, 2] + list(range(5, 24)),
+            names=['movie_id', 'title', 'release_date'] + genre_cols
         )
         df["movie_id"] = df["movie_id"].astype(str)
 
@@ -206,17 +209,6 @@ class Recommendation():
         liked_movie_ids = []
 
         for title in titles:
-            movie_id, clean_title = self.link_title(title)
-            if movie_id is not None:
-                liked_movie_ids.append(movie_id)
-                # print genres for safety check
-                info = metadata.get(movie_id)
-                if info:
-                    print(f"Input movie: {clean_title} → Genres: {info['genres']}")
-                else:
-                    print(f"Input movie: {clean_title} → No metadata found")
-
-        for title in titles:
             movie_id, _ = self.link_title(title)  # use your existing title linker
             if movie_id is not None:
                 liked_movie_ids.append(movie_id)
@@ -237,38 +229,74 @@ class Recommendation():
             liked_genres.update(info["genres"])
 
         if not liked_years or not liked_genres:
-            return []   # nothing to filter by
-
-        # filter recommendations
-        filtered = []
-
-        for rec in recommendations:   # each rec: {"movie_id":..., "title":..., "score":...}
-            mid = rec["movie_id"]
-            info = metadata.get(mid)
-            if info:
-                print(f"Recommended movie: {rec['title']} → Genres: {info['genres']}")
-
-            if not info:
+            return recommendations  # nothing to filter by
+        
+        # 1. Calculate the target year window based on liked movies
+        
+        # The recommended movie year must be within the window of the mean liked year.
+        
+        mean_liked_year = np.mean(liked_years)
+        
+        # We explicitly cast to int for robust comparison, ensuring we don't have
+        # floating point artifacts causing unexpected exclusions.
+        min_year_bound = int(np.floor(mean_liked_year - year_window))
+        max_year_bound = int(np.ceil(mean_liked_year + year_window))
+        
+        # 2. Filter, Enrich, and Prepare for Sorting
+        
+        filtered_and_enriched_recs = []
+        
+        for rec in recommendations:
+            movie_id = rec["movie_id"]
+            
+            # Look up genre and year metadata
+            info = metadata.get(movie_id)
+            
+            # Skip if metadata is missing
+            if not info or not info.get("year"):
                 continue
 
             rec_year = info["year"]
-            rec_genres = set(info["genres"])
+            rec_genres_list = info["genres"]
+            rec_genres_set = set(rec_genres_list)
+            
+            # --- Year Filtering ---
+            # Check if the movie's year falls within the calculated window
+            if not (min_year_bound <= rec_year <= max_year_bound):
+                continue # Discard this recommendation
+            
+            # --- Genre Matching ---
+            
+            # Primary Sorting Metric: Number of matching genres (Intersection size)
+            matches = len(rec_genres_set.intersection(liked_genres))
+            
+            # Secondary Sorting Metric: Total number of genres in the recommended movie
+            total_genres = len(rec_genres_set)
 
-            # genre condition
-            extra_genres = rec_genres - liked_genres
-
-            # reject if deviation is too high
-            if len(extra_genres) > max_genre_deviation:
-                continue
-
-            # year condition
-            if rec_year:
-                if all(abs(rec_year - y) > year_window for y in liked_years):
-                    continue
-
-            filtered.append(rec)
-        print(f"initial result: {recommendations}")
-        print(f"filtered result: {filtered}")
-        return filtered
-
-
+            # Create an enriched record
+            enriched_rec = rec.copy()
+            enriched_rec['matches'] = matches
+            enriched_rec['total_genres'] = total_genres
+            enriched_rec['year'] = rec_year
+            enriched_rec['genre_list'] = rec_genres_list
+            
+            filtered_and_enriched_recs.append(enriched_rec)
+            
+        # If all recommendations were filtered out, return an empty list
+        if not filtered_and_enriched_recs:
+             return []
+             
+        # 3. Sort the Filtered Recommendations
+        
+        # Sorting Keys (Order of Precedence):
+        # 1. Matches: DESCENDING (Max matches first) -> use -x['matches']
+        # 2. Total Genres: ASCENDING (Fewer genres is a "purer" match) -> use x['total_genres']
+        # 3. Original Score: DESCENDING (Use original high score to break remaining ties) -> use -x['score']
+        
+        sorted_recommendations = sorted(
+            filtered_and_enriched_recs,
+            key=lambda x: (-x['matches'], x['total_genres'], -x['score'])
+        )
+        
+        # 4. Apply Final Limit
+        return sorted_recommendations[:final_limit]

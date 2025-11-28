@@ -16,7 +16,7 @@ pip install pandas editdistance rdflib joblib scikit-learn sklearn-crfsuite
 To run the bot do the following:
 1.  Open terminal
 2.  Enter "conda activate recommendation" to run on python 3.11.14 which is necessary for the suprise library
-2.  Enter "cd Project Submission 2/code"
+2.  Enter "cd Project Submission 3/code"
 3.  Run "python agent.py"
 4.  Wait until graph is loaded and the bot is listening (this can take a while)
 
@@ -116,10 +116,9 @@ class Agent:
             
         Returns:
             tuple[str, str]: (pure_question, question_type)
-            - pure_question: The question after the first colon (preserves original case)
+            - pure_question: The question after the first colon
             - question_type: One of 'general', 'factual', or 'embedding'
         """
-        # Use lowercase for classification but preserve original for extraction
         question_lower = question.lower()
         
         # check for SPARQL query indicators
@@ -136,7 +135,7 @@ class Agent:
         else:
             question_type = "general"
             
-        # Extract pure question after the first colon (using original case)
+        # Extract pure question after the first colon
         if ":" in question:
             pure_question = question.split(":", 1)[1].strip()
         else:
@@ -172,10 +171,13 @@ class Agent:
         elif q_type == "recommendation":
             movie_list = self.extraction.extract_entities(pure_q)
             print(f"Identified movies: {movie_list}.")
-            movies = self.recommendation.recommend_from_titles(movie_list, top_n=CONFIG["Recommendation"]["top_n"])
+            movies = self.recommendation.recommend_from_titles(movie_list)
+            filtered_movies = self.recommendation.filter_recommendations(movie_list, movies["recommendations"])
             recs = []
-            for recommendation in movies["recommendations"]:
-                recs.append(recommendation["title"])
+            for recommendation in filtered_movies:
+                mid = recommendation["movie_id"]
+                recs.append(self.recommendation.id_to_clean_title[mid])
+                #recs.append(recommendation["title"])
             return " and ".join(recs) if recs else "No results found."
         
         elif q_type == "embedding":
