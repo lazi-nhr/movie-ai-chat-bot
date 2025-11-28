@@ -116,26 +116,27 @@ class Agent:
             
         Returns:
             tuple[str, str]: (pure_question, question_type)
-            - pure_question: The question after the first colon
+            - pure_question: The question after the first colon (preserves original case)
             - question_type: One of 'general', 'factual', or 'embedding'
         """
-        question = question.lower()
+        # Use lowercase for classification but preserve original for extraction
+        question_lower = question.lower()
         
         # check for SPARQL query indicators
-        if question.startswith("prefix") or any(k in question for k in ("select", "ask", "construct", "describe")):
+        if question_lower.startswith("prefix") or any(k in question_lower for k in ("select", "ask", "construct", "describe")):
             return question, "sparql"
         
         # check for keywords
-        elif "recommend" in question:
+        elif "recommend" in question_lower:
             question_type = "recommendation"
-        elif "factual" in question:
+        elif "factual" in question_lower:
             question_type = "factual"
-        elif "embedding" in question:
+        elif "embedding" in question_lower:
             question_type = "embedding"
         else:
             question_type = "general"
             
-        # Extract pure question after the first colon
+        # Extract pure question after the first colon (using original case)
         if ":" in question:
             pure_question = question.split(":", 1)[1].strip()
         else:

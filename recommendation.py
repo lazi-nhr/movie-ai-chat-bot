@@ -19,7 +19,7 @@ class Recommendation():
 
     def __init__(self):
         self.svd_algo, self.trainset = self.load_svd() # train and load SVD model
-        self.title_to_id, self.id_to_title = self.load_title_maps() # load title mappings
+        self.title_to_id, self.id_to_title, self.id_to_clean_title = self.load_title_maps() # load title mappings
 
     def load_svd(self):
         data = Dataset.load_builtin('ml-100k') # load MovieLens 100k dataset
@@ -59,7 +59,8 @@ class Recommendation():
 
         title_to_id = dict(zip(df['clean_title'], df['movie_id']))
         id_to_title = dict(zip(df['movie_id'], df['title']))
-        return title_to_id, id_to_title
+        id_to_clean_title = dict(zip(df['movie_id'], df['clean_title']))
+        return title_to_id, id_to_title, id_to_clean_title
     
 
     def link_title(self, surface):
@@ -89,7 +90,7 @@ class Recommendation():
     def recommend_from_titles(
         self,
         titles,
-        top_n=10,
+        top_n=5,
         per_item_pool=500
     ):
         """
@@ -155,9 +156,119 @@ class Recommendation():
             "recommendations": recs      # ranked list
         }
 
+    def filter_recommendations(self, titles, recommendations, year_window=5, max_genre_deviation=1, u_item_path=None):
+        """
+        titles: list of strings (user input)
+        recommendations: list of dicts produced by recommend_from_titles
+        year_window: e.g. 10 → only keep movies within ±10 years
+        """
+        # load metadata from u.item
+        default_path = os.path.expanduser("~/.surprise_data/ml-100k/ml-100k/u.item")
+        path = u_item_path or default_path
 
-# --- usage example ---
-rec = Recommendation()
-movies = ["The Lion King", "Pocahontas", "The Beauty and the Beast"]
-result = rec.recommend_from_titles(movies, top_n=3)
-print(result)
+        # according to ChatGPT ml-100k has this format for the genres
+        genre_cols = [
+        "unknown","Action","Adventure","Animation","Children","Comedy","Crime",
+        "Documentary","Drama","Fantasy","Film-Noir","Horror","Musical",
+        "Mystery","Romance","Sci-Fi","Thriller","War","Western"
+        ]
+
+        df = pd.read_csv(
+        path, sep='|', header=None, encoding='latin-1',
+        usecols=[0, 1, 2] + list(range(5, 24)),
+        names=['movie_id', 'title', 'release_date'] + genre_cols
+        )
+        df["movie_id"] = df["movie_id"].astype(str)
+
+        def extract_year(row):
+            rd = row["release_date"]
+            if isinstance(rd, str) and len(rd) >= 4:
+                try:
+                    return int(rd[-4:])
+                except:
+                    pass
+            # fallback "(1994)" format
+            match = re.search(r"\((\d{4})\)$", row["title"])
+            return int(match.group(1)) if match else None
+
+        df["year"] = df.apply(extract_year, axis=1)
+
+        # extract genres
+        def row_genres(row):
+            return [g for g in genre_cols if row[g] == 1]
+
+        df["genres"] = df.apply(row_genres, axis=1)
+
+        # build metadata dictionary
+        metadata = df.set_index("movie_id")[["year", "genres"]].to_dict(orient="index")
+
+        # resolve the user-provided titles to movie_ids
+        liked_movie_ids = []
+
+        for title in titles:
+            movie_id, clean_title = self.link_title(title)
+            if movie_id is not None:
+                liked_movie_ids.append(movie_id)
+                # print genres for safety check
+                info = metadata.get(movie_id)
+                if info:
+                    print(f"Input movie: {clean_title} → Genres: {info['genres']}")
+                else:
+                    print(f"Input movie: {clean_title} → No metadata found")
+
+        for title in titles:
+            movie_id, _ = self.link_title(title)  # use your existing title linker
+            if movie_id is not None:
+                liked_movie_ids.append(movie_id)
+
+        if not liked_movie_ids:
+            return []
+
+        # collect liked years + genres
+        liked_years = []
+        liked_genres = set()
+
+        for mid in liked_movie_ids:
+            info = metadata.get(mid)
+            if not info:
+                continue
+            if info["year"]:
+                liked_years.append(info["year"])
+            liked_genres.update(info["genres"])
+
+        if not liked_years or not liked_genres:
+            return []   # nothing to filter by
+
+        # filter recommendations
+        filtered = []
+
+        for rec in recommendations:   # each rec: {"movie_id":..., "title":..., "score":...}
+            mid = rec["movie_id"]
+            info = metadata.get(mid)
+            if info:
+                print(f"Recommended movie: {rec['title']} → Genres: {info['genres']}")
+
+            if not info:
+                continue
+
+            rec_year = info["year"]
+            rec_genres = set(info["genres"])
+
+            # genre condition
+            extra_genres = rec_genres - liked_genres
+
+            # reject if deviation is too high
+            if len(extra_genres) > max_genre_deviation:
+                continue
+
+            # year condition
+            if rec_year:
+                if all(abs(rec_year - y) > year_window for y in liked_years):
+                    continue
+
+            filtered.append(rec)
+        print(f"initial result: {recommendations}")
+        print(f"filtered result: {filtered}")
+        return filtered
+
+
