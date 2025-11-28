@@ -1,0 +1,28 @@
+Clone Repo
+
+cd /files
+git clone git@github.com:lazi-nhr/atai-chat-bot
+
+
+Pull
+
+git pull
+
+
+
+add all files
+
+git add .
+
+
+
+commit
+
+git commit -m "your descriptive message"
+
+
+
+
+push
+
+git push
