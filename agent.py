@@ -28,6 +28,42 @@ To test and interact with the bot do the following:
 3.  Go to "Chat"
 4.  Click on "Request Chat"
 5.  Enter "CyanPeekingMouse" and click on "Request"
+
+The data is strucutred as follows:
+
+The dataset directory structure is as follows:
+
+/space_mounts/atai-hs25/dataset/
+├── additional/
+│   ├── images.json
+│   ├── movie_plots.csv
+│   ├── plots.csv
+│   └── user_comments.csv
+│
+├── embeddings/
+│   ├── entity_embeds.npy
+│   ├── entity_ids.del
+│   ├── relation_embeds.npy
+│   └── relation_ids.del
+│
+├── graph.nt
+├── graph.tsv
+│
+├── image_features/
+│   ├── 0000.pkl
+│   ├── 0001.pkl
+│   ├──  ... 
+│   └── 0347.pkl
+│
+├── images/
+│   ├── 0000/
+│   ├── 0001/
+│   ├──  ... 
+│   └── 0347/
+│
+└── ratings/
+    ├── item_ratings.csv
+    └── user_ratings.csv
 """
 
 class Agent:
