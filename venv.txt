@@ -6,3 +6,13 @@ source ~/venvs/stableML/bin/activate
 
 3. deactivate virtual environment
 ~/venvs/stableML/bin/activate
+
+
+
+in vs code (nuvolos):
+
+1. conda create -n <name> python=3.11 -y
+
+2. conda activate final
+
+3. conda deactivate

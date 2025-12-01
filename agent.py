@@ -60,6 +60,10 @@ The dataset directory structure is as follows:
 │   ├── 0001/
 │   ├──  ... 
 │   └── 0347/
+│       ├── 15f1zhXXmhADnscuAdDayGNdXpk.jpg
+│       ├── 17U6qlr2QR79MVypisjRD9CtKtg.jpg
+│       ├──  ...
+│       └── zZnaTUuf3TmOq6seZAHQmU7BLaE.jpg
 │
 └── ratings/
     ├── item_ratings.csv
