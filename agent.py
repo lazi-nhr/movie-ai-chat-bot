@@ -1,10 +1,13 @@
 import re
 import json
+from random import choice
+
 from speakeasypy import Chatroom, EventType, Speakeasy
 from extraction import Extraction
 from embeddings import Embeddings
 from factual import Factual
 from recommendation import Recommendation
+from multimedia import Multimedia
 from config import CONFIG
 
 
@@ -80,6 +83,7 @@ class Agent:
         self.embeddings = Embeddings()
         self.factual = Factual()
         self.recommendation = Recommendation()
+        self.multimedia = Multimedia()
 
         self.speakeasy = Speakeasy(host=self.url, username=self.username, password=self.password)
         self.speakeasy.login()
@@ -166,22 +170,41 @@ class Agent:
             return question, "sparql"
         
         # check for keywords
+        # recommendation keywords
         elif "recommend" in question_lower:
             question_type = "recommendation"
+
+        # factual keywords
         elif "factual" in question_lower:
             question_type = "factual"
+
+        # embedding keywords
         elif "embedding" in question_lower:
             question_type = "embedding"
+
+        # person multimedia keywords
+        elif "picture" in question_lower or "image" in question_lower or "photo" in question_lower or "look like" in question_lower:
+            question_type = "multimedia"
+
+        # movie multimedia keywords
+        elif "poster" in question_lower or "cover" in question_lower:
+            question_type = "multimedia"
+
+        # backdrop multimedia keywords
+        elif "backdrop" in question_lower or "scene" in question_lower or " scenery" in question_lower:
+            question_type = "multimedia"
+
+        # default to general
         else:
             question_type = "general"
             
-        # Extract pure question after the first colon
-        if ":" in question:
-            pure_question = question.split(":", 1)[1].strip()
-        else:
-            pure_question = question
+        # Extract pure question after the first colon (NOT NECESSARY ANYMORE)
+        #if ":" in question:
+        #    pure_question = question.split(":", 1)[1].strip()
+        #else:
+        #    pure_question = question
             
-        return pure_question, question_type
+        return question, question_type
     
     def process_question(self, question: str) -> str:
         pure_q, q_type = self.classify_question(question)
@@ -225,7 +248,7 @@ class Agent:
             print(f"Identified relation: {relation_label}.")
 
             results = self.embeddings.get_best_result(
-                entity_uri, 
+                entity_uri,
                 relation_uri,
                 1
             )
@@ -236,6 +259,20 @@ class Agent:
             
             type_qid = entity_types.get(head_uri, "N/A")
             return f"The answer suggested by embeddings is: {head_label} (type: {type_qid})"
+        
+        elif q_type == "multimedia":
+            print(f"Identified entity: {entity_label}.")
+            multimedia_type = self.multimedia.classify_type(pure_q)
+            linked_label, linked_values, link_score, link_distance = self.multimedia.link_entity(entity_label, multimedia_type)
+            print(f"Linked to multimedia entity: {linked_label} with score {link_score:.2f}.")
+
+            # randomly select one multimedia value to return
+            if linked_values:
+                selected_value = choice(linked_values)
+                return f"The {multimedia_type} for {linked_label} is: {selected_value}"
+            else:
+                return f"No multimedia found for {linked_label}."
+
 
 
 if __name__ == '__main__':
