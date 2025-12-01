@@ -1,213 +1,206 @@
 #!/usr/bin/env python3
-"""
-Build JSON indexes of images by names using IMDb, writing output to:
-
-    cache/multimedia/profiles.json
-    cache/multimedia/posters.json
-    cache/multimedia/backdrops.json
-
-Requirements:
-    pip install cinemagoer tqdm
-"""
 
 import os
 import json
 import time
+import pandas as pd
 from collections import defaultdict
-
+from tqdm import tqdm
 from imdb import IMDb
-from tqdm import tqdm  # progress bars
 
-
-# ============================
+# ============================================================
 # CONFIGURATION
-# ============================
+# Get imdb data from https://datasets.imdbws.com/
+# ============================================================
 
-# Dataset root (read-only)
-DATA_ROOT = "/space_mounts/atai-hs25/dataset"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+DATA_ROOT = os.path.join(base_dir, "dataset")
 IMAGES_JSON = os.path.join(DATA_ROOT, "additional", "images.json")
 
-# Writable local cache folder
-CACHE_ROOT = "./cache/multimedia"
-os.makedirs(CACHE_ROOT, exist_ok=True)
+# IMDb TSV files (adjust if stored elsewhere)
+NAME_TSV = os.path.join(base_dir, "cache/multimedia/name.basics.tsv.gz")
+TITLE_TSV = os.path.join(base_dir, "cache/multimedia/title.basics.tsv.gz")
 
-OUTPUT_PROFILES = os.path.join(CACHE_ROOT, "profiles.json")
-OUTPUT_POSTERS = os.path.join(CACHE_ROOT, "posters.json")
-OUTPUT_BACKDROPS = os.path.join(CACHE_ROOT, "backdrops.json")
+# Output directory
+OUT_DIR = "./cache/multimedia"
+os.makedirs(OUT_DIR, exist_ok=True)
 
-REQUEST_SLEEP = 0.2  # polite IMDb request delay
+OUT_PROFILES  = os.path.join(OUT_DIR, "profiles.json")
+OUT_POSTERS   = os.path.join(OUT_DIR, "posters.json")
+OUT_BACKDROPS = os.path.join(OUT_DIR, "backdrops.json")
+
+REQUEST_SLEEP = 0.1  # fallback IMDbPY delay (rare)
 
 
-# ============================
+# ============================================================
 # HELPERS
-# ============================
+# ============================================================
 
-def normalize_image_id(img: str) -> str:
-    """Turn '0344/abc.jpg' → '0344/abc'."""
+def normalize_image_id(img):
+    """Remove .jpg extension."""
     return img[:-4] if img.lower().endswith(".jpg") else img
 
 
-def collect_ids(images_json_path: str):
+def load_name_lookup(path):
     """
-    Scan images.json and group by IMDb IDs.
+    Loads nconst -> primaryName for *only the required columns*.
+    """
+    print("[INFO] Loading people lookup (nconst -> primaryName)")
+    df = pd.read_csv(
+        path,
+        sep="\t",
+        dtype=str,
+        usecols=["nconst", "primaryName"]
+    )
+    return dict(zip(df["nconst"], df["primaryName"]))
 
-    Returns:
-        profiles_by_pid
-        posters_by_mid
-        backdrops_by_mid
+
+def load_title_lookup(path):
     """
-    with open(images_json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    Loads tconst -> primaryTitle for movies.
+    """
+    print("[INFO] Loading movie lookup (tconst -> primaryTitle)")
+    df = pd.read_csv(
+        path,
+        sep="\t",
+        dtype=str,
+        usecols=["tconst", "titleType", "primaryTitle"]
+    )
+
+    # keep movies only
+    df = df[df["titleType"] == "movie"]
+
+    return dict(zip(df["tconst"], df["primaryTitle"]))
+
+
+def fallback_imdb_lookup_person(pid, ia):
+    code = pid[2:] if pid.startswith("nm") else pid
+    try:
+        person = ia.get_person(code)
+        if person:
+            return person.get("name")
+    except Exception:
+        return None
+    return None
+
+
+def fallback_imdb_lookup_movie(mid, ia):
+    code = mid[2:] if mid.startswith("tt") else mid
+    try:
+        movie = ia.get_movie(code)
+        if movie:
+            return movie.get("title")
+    except Exception:
+        return None
+    return None
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+def main():
+    if not os.path.exists(IMAGES_JSON):
+        raise FileNotFoundError(IMAGES_JSON)
+
+    print("[INFO] Reading images.json ...")
+    with open(IMAGES_JSON, "r", encoding="utf-8") as f:
+        images = json.load(f)
 
     profiles_by_pid = defaultdict(list)
     posters_by_mid = defaultdict(list)
     backdrops_by_mid = defaultdict(list)
 
-    print("[INFO] Scanning images.json ...")
-    for item in tqdm(data, desc="Processing images.json", unit="img"):
+    print("[INFO] Extracting IDs from images.json")
+    for item in tqdm(images, unit="img"):
         img = item.get("img")
-        img_type = item.get("type")
+        t = item.get("type")
         movies = item.get("movie", [])
-        cast = item.get("cast", [])
+        people = item.get("cast", [])
 
-        if not img or not img_type:
+        if not img or not t:
             continue
 
-        image_id = normalize_image_id(img)
+        img_id = normalize_image_id(img)
 
-        if img_type == "profile":
-            for pid in cast:
-                profiles_by_pid[pid].append(image_id)
+        if t == "profile":
+            for pid in people:
+                profiles_by_pid[pid].append(img_id)
 
-        elif img_type == "poster":
+        elif t == "poster":
             for mid in movies:
-                posters_by_mid[mid].append(image_id)
+                posters_by_mid[mid].append(img_id)
 
-        elif img_type == "backdrop":
+        elif t == "backdrop":
             for mid in movies:
-                backdrops_by_mid[mid].append(image_id)
+                backdrops_by_mid[mid].append(img_id)
 
-    return profiles_by_pid, posters_by_mid, backdrops_by_mid
+    # ============================================================
+    # Load T-SV maps
+    # ============================================================
 
+    print("[INFO] Loading local IMDb TSV lookup tables")
+    people_map = load_name_lookup(NAME_TSV)
+    movie_map  = load_title_lookup(TITLE_TSV)
 
-def fetch_person_names(pids):
-    """IMDb person lookup using tqdm."""
+    # IMDbPY fallback
     ia = IMDb()
-    pid_to_name = {}
 
-    print("[INFO] Fetching person names from IMDb ...")
-
-    for pid in tqdm(sorted(set(pids)), desc="Fetching persons", unit="person"):
-        code = pid[2:] if pid.startswith("nm") else pid
-        name = pid
-
-        try:
-            person = ia.get_person(code)
-            if person:
-                name = person.get("name", pid)
-        except Exception as e:
-            print(f"[WARN] Failed to fetch person {pid}: {e}")
-
-        pid_to_name[pid] = name
-
-        if REQUEST_SLEEP:
-            time.sleep(REQUEST_SLEEP)
-
-    print(f"[INFO] Done fetching {len(pid_to_name)} person names.")
-    return pid_to_name
-
-
-def fetch_movie_titles(mids):
-    """IMDb movie lookup using tqdm."""
-    ia = IMDb()
-    mid_to_title = {}
-
-    print("[INFO] Fetching movie titles from IMDb ...")
-
-    for mid in tqdm(sorted(set(mids)), desc="Fetching movies", unit="movie"):
-        code = mid[2:] if mid.startswith("tt") else mid
-        title = mid
-
-        try:
-            movie = ia.get_movie(code)
-            if movie:
-                title = movie.get("title", mid)
-        except Exception as e:
-            print(f"[WARN] Failed to fetch movie {mid}: {e}")
-
-        mid_to_title[mid] = title
-
-        if REQUEST_SLEEP:
-            time.sleep(REQUEST_SLEEP)
-
-    print(f"[INFO] Done fetching {len(mid_to_title)} movie titles.")
-    return mid_to_title
-
-
-def build_named_mappings(profiles_by_pid, posters_by_mid, backdrops_by_mid):
-    pids = list(profiles_by_pid.keys())
-    mids = list(set(list(posters_by_mid.keys()) + list(backdrops_by_mid.keys())))
-
-    print(f"[INFO] Unique person IDs: {len(pids)}")
-    print(f"[INFO] Unique movie  IDs: {len(mids)}")
-
-    pid_to_name = fetch_person_names(pids) if pids else {}
-    mid_to_title = fetch_movie_titles(mids) if mids else {}
+    # ============================================================
+    # Build final name mappings
+    # ============================================================
 
     profiles_named = defaultdict(list)
-    for pid, imgs in profiles_by_pid.items():
-        name = pid_to_name.get(pid, pid)
+    posters_named = defaultdict(list)
+    backdrops_named = defaultdict(list)
+
+    print("[INFO] Resolving PERSON names")
+    for pid, imgs in tqdm(profiles_by_pid.items(), unit="pid"):
+        name = people_map.get(pid)
+        if not name:  # fallback only if missing
+            name = fallback_imdb_lookup_person(pid, ia)
+            if not name:
+                name = pid  # last fallback
+            time.sleep(REQUEST_SLEEP)
         profiles_named[name].extend(imgs)
 
-    posters_named = defaultdict(list)
-    for mid, imgs in posters_by_mid.items():
-        title = mid_to_title.get(mid, mid)
+    print("[INFO] Resolving MOVIE titles for posters")
+    for mid, imgs in tqdm(posters_by_mid.items(), unit="mid"):
+        title = movie_map.get(mid)
+        if not title:
+            title = fallback_imdb_lookup_movie(mid, ia)
+            if not title:
+                title = mid
+            time.sleep(REQUEST_SLEEP)
         posters_named[title].extend(imgs)
 
-    backdrops_named = defaultdict(list)
-    for mid, imgs in backdrops_by_mid.items():
-        title = mid_to_title.get(mid, mid)
+    print("[INFO] Resolving MOVIE titles for backdrops")
+    for mid, imgs in tqdm(backdrops_by_mid.items(), unit="mid"):
+        title = movie_map.get(mid)
+        if not title:
+            title = fallback_imdb_lookup_movie(mid, ia)
+            if not title:
+                title = mid
+            time.sleep(REQUEST_SLEEP)
         backdrops_named[title].extend(imgs)
 
-    return (
-        dict(profiles_named),
-        dict(posters_named),
-        dict(backdrops_named),
-    )
+    # ============================================================
+    # Write JSON outputs
+    # ============================================================
 
+    with open(OUT_PROFILES, "w", encoding="utf-8") as f:
+        json.dump(dict(profiles_named), f, indent=2, ensure_ascii=False)
 
-# ============================
-# MAIN
-# ============================
+    with open(OUT_POSTERS, "w", encoding="utf-8") as f:
+        json.dump(dict(posters_named), f, indent=2, ensure_ascii=False)
 
-def main():
-    if not os.path.exists(IMAGES_JSON):
-        raise FileNotFoundError(f"images.json not found at: {IMAGES_JSON}")
+    with open(OUT_BACKDROPS, "w", encoding="utf-8") as f:
+        json.dump(dict(backdrops_named), f, indent=2, ensure_ascii=False)
 
-    print("[INFO] Collecting IMDb ids from images.json …")
-    profiles_by_pid, posters_by_mid, backdrops_by_mid = collect_ids(IMAGES_JSON)
-
-    print(f"[INFO] profiles_by_pid:  {len(profiles_by_pid)}")
-    print(f"[INFO] posters_by_mid:   {len(posters_by_mid)}")
-    print(f"[INFO] backdrops_by_mid: {len(backdrops_by_mid)}")
-
-    profiles_named, posters_named, backdrops_named = build_named_mappings(
-        profiles_by_pid, posters_by_mid, backdrops_by_mid
-    )
-
-    os.makedirs(CACHE_ROOT, exist_ok=True)
-
-    with open(OUTPUT_PROFILES, "w", encoding="utf-8") as f:
-        json.dump(profiles_named, f, indent=2, ensure_ascii=False)
-    print(f"[INFO] Saved → {OUTPUT_PROFILES}")
-
-    with open(OUTPUT_POSTERS, "w", encoding="utf-8") as f:
-        json.dump(posters_named, f, indent=2, ensure_ascii=False)
-    print(f"[INFO] Saved → {OUTPUT_POSTERS}")
-
-    with open(OUTPUT_BACKDROPS, "w", encoding="utf-8") as f:
-        json.dump(backdrops_named, f, indent=2, ensure_ascii=False)
-    print(f"[INFO] Saved → {OUTPUT_BACKDROPS}")
+    print("\n[INFO] Done!")
+    print(f"Profiles saved to:  {OUT_PROFILES}")
+    print(f"Posters saved to:   {OUT_POSTERS}")
+    print(f"Backdrops saved to: {OUT_BACKDROPS}")
 
 
 if __name__ == "__main__":

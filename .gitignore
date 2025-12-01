@@ -3,5 +3,7 @@ Speakeasy-Python-Client-Library-main
 Tutorials
 dataset
 archive
-cache
 __pycache__
+cache/recommendation/ratings.csv
+cache/recommendation/movies.csv
+cache/entities/index_to_identifier.json

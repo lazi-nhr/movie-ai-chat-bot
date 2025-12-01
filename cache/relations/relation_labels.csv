@@ -1,0 +1,989 @@
+uri,kind,label,lang,type
+http://ddis.ch/atai/indirectSubclassOf,relation,Indirectsubclassof,,relation
+http://www.wikidata.org/prop/direct/P101,relation,P101,,relation
+http://www.wikidata.org/prop/direct/P1018,relation,P1018,,relation
+http://www.wikidata.org/prop/direct/P102,relation,P102,,relation
+http://www.wikidata.org/prop/direct/P10241,relation,P10241,,relation
+http://www.wikidata.org/prop/direct/P1027,relation,P1027,,relation
+http://www.wikidata.org/prop/direct/P1029,relation,P1029,,relation
+http://www.wikidata.org/prop/direct/P103,relation,P103,,relation
+http://www.wikidata.org/prop/direct/P1034,relation,P1034,,relation
+http://www.wikidata.org/prop/direct/P1035,relation,P1035,,relation
+http://www.wikidata.org/prop/direct/P1037,relation,P1037,,relation
+http://www.wikidata.org/prop/direct/P1038,relation,P1038,,relation
+http://www.wikidata.org/prop/direct/P1040,relation,P1040,,relation
+http://www.wikidata.org/prop/direct/P1049,relation,P1049,,relation
+http://www.wikidata.org/prop/direct/P105,relation,P105,,relation
+http://www.wikidata.org/prop/direct/P1050,relation,P1050,,relation
+http://www.wikidata.org/prop/direct/P1056,relation,P1056,,relation
+http://www.wikidata.org/prop/direct/P106,relation,occupation,,relation
+http://www.wikidata.org/prop/direct/P10606,relation,P10606,,relation
+http://www.wikidata.org/prop/direct/P1066,relation,P1066,,relation
+http://www.wikidata.org/prop/direct/P10664,relation,P10664,,relation
+http://www.wikidata.org/prop/direct/P1071,relation,P1071,,relation
+http://www.wikidata.org/prop/direct/P1074,relation,P1074,,relation
+http://www.wikidata.org/prop/direct/P10741,relation,P10741,,relation
+http://www.wikidata.org/prop/direct/P108,relation,P108,,relation
+http://www.wikidata.org/prop/direct/P1080,relation,P1080,,relation
+http://www.wikidata.org/prop/direct/P10888,relation,P10888,,relation
+http://www.wikidata.org/prop/direct/P110,relation,P110,,relation
+http://www.wikidata.org/prop/direct/P11106,relation,P11106,,relation
+http://www.wikidata.org/prop/direct/P11108,relation,P11108,,relation
+http://www.wikidata.org/prop/direct/P112,relation,P112,,relation
+http://www.wikidata.org/prop/direct/P1142,relation,P1142,,relation
+http://www.wikidata.org/prop/direct/P1165,relation,P1165,,relation
+http://www.wikidata.org/prop/direct/P11738,relation,P11738,,relation
+http://www.wikidata.org/prop/direct/P11799,relation,P11799,,relation
+http://www.wikidata.org/prop/direct/P118,relation,P118,,relation
+http://www.wikidata.org/prop/direct/P119,relation,P119,,relation
+http://www.wikidata.org/prop/direct/P1192,relation,P1192,,relation
+http://www.wikidata.org/prop/direct/P1196,relation,P1196,,relation
+http://www.wikidata.org/prop/direct/P121,relation,P121,,relation
+http://www.wikidata.org/prop/direct/P122,relation,P122,,relation
+http://www.wikidata.org/prop/direct/P123,relation,P123,,relation
+http://www.wikidata.org/prop/direct/P12443,relation,P12443,,relation
+http://www.wikidata.org/prop/direct/P126,relation,P126,,relation
+http://www.wikidata.org/prop/direct/P1269,relation,P1269,,relation
+http://www.wikidata.org/prop/direct/P127,relation,P127,,relation
+http://www.wikidata.org/prop/direct/P1283,relation,P1283,,relation
+http://www.wikidata.org/prop/direct/P1290,relation,P1290,,relation
+http://www.wikidata.org/prop/direct/P12933,relation,P12933,,relation
+http://www.wikidata.org/prop/direct/P1299,relation,P1299,,relation
+http://www.wikidata.org/prop/direct/P1303,relation,P1303,,relation
+http://www.wikidata.org/prop/direct/P1304,relation,P1304,,relation
+http://www.wikidata.org/prop/direct/P131,relation,located in,,relation
+http://www.wikidata.org/prop/direct/P1313,relation,P1313,,relation
+http://www.wikidata.org/prop/direct/P1327,relation,P1327,,relation
+http://www.wikidata.org/prop/direct/P1336,relation,P1336,,relation
+http://www.wikidata.org/prop/direct/P1340,relation,P1340,,relation
+http://www.wikidata.org/prop/direct/P1343,relation,P1343,,relation
+http://www.wikidata.org/prop/direct/P1344,relation,P1344,,relation
+http://www.wikidata.org/prop/direct/P13459,relation,P13459,,relation
+http://www.wikidata.org/prop/direct/P1346,relation,P1346,,relation
+http://www.wikidata.org/prop/direct/P135,relation,P135,,relation
+http://www.wikidata.org/prop/direct/P13574,relation,P13574,,relation
+http://www.wikidata.org/prop/direct/P136,relation,genre,,relation
+http://www.wikidata.org/prop/direct/P1365,relation,P1365,,relation
+http://www.wikidata.org/prop/direct/P1366,relation,P1366,,relation
+http://www.wikidata.org/prop/direct/P137,relation,P137,,relation
+http://www.wikidata.org/prop/direct/P1376,relation,P1376,,relation
+http://www.wikidata.org/prop/direct/P138,relation,P138,,relation
+http://www.wikidata.org/prop/direct/P1382,relation,P1382,,relation
+http://www.wikidata.org/prop/direct/P1383,relation,P1383,,relation
+http://www.wikidata.org/prop/direct/P1387,relation,P1387,,relation
+http://www.wikidata.org/prop/direct/P140,relation,P140,,relation
+http://www.wikidata.org/prop/direct/P1411,relation,P1411,,relation
+http://www.wikidata.org/prop/direct/P1412,relation,P1412,,relation
+http://www.wikidata.org/prop/direct/P1416,relation,P1416,,relation
+http://www.wikidata.org/prop/direct/P1419,relation,P1419,,relation
+http://www.wikidata.org/prop/direct/P1427,relation,P1427,,relation
+http://www.wikidata.org/prop/direct/P1429,relation,P1429,,relation
+http://www.wikidata.org/prop/direct/P1431,relation,P1431,,relation
+http://www.wikidata.org/prop/direct/P1433,relation,P1433,,relation
+http://www.wikidata.org/prop/direct/P1434,relation,P1434,,relation
+http://www.wikidata.org/prop/direct/P1435,relation,P1435,,relation
+http://www.wikidata.org/prop/direct/P144,relation,P144,,relation
+http://www.wikidata.org/prop/direct/P1441,relation,P1441,,relation
+http://www.wikidata.org/prop/direct/P1444,relation,P1444,,relation
+http://www.wikidata.org/prop/direct/P1445,relation,P1445,,relation
+http://www.wikidata.org/prop/direct/P1455,relation,P1455,,relation
+http://www.wikidata.org/prop/direct/P1478,relation,P1478,,relation
+http://www.wikidata.org/prop/direct/P1479,relation,P1479,,relation
+http://www.wikidata.org/prop/direct/P149,relation,P149,,relation
+http://www.wikidata.org/prop/direct/P150,relation,P150,,relation
+http://www.wikidata.org/prop/direct/P1532,relation,P1532,,relation
+http://www.wikidata.org/prop/direct/P1535,relation,P1535,,relation
+http://www.wikidata.org/prop/direct/P1537,relation,P1537,,relation
+http://www.wikidata.org/prop/direct/P1542,relation,P1542,,relation
+http://www.wikidata.org/prop/direct/P1546,relation,P1546,,relation
+http://www.wikidata.org/prop/direct/P155,relation,P155,,relation
+http://www.wikidata.org/prop/direct/P1552,relation,P1552,,relation
+http://www.wikidata.org/prop/direct/P1557,relation,P1557,,relation
+http://www.wikidata.org/prop/direct/P156,relation,P156,,relation
+http://www.wikidata.org/prop/direct/P1576,relation,P1576,,relation
+http://www.wikidata.org/prop/direct/P1589,relation,P1589,,relation
+http://www.wikidata.org/prop/direct/P159,relation,P159,,relation
+http://www.wikidata.org/prop/direct/P1598,relation,P1598,,relation
+http://www.wikidata.org/prop/direct/P16,relation,P16,,relation
+http://www.wikidata.org/prop/direct/P161,relation,cast member,,relation
+http://www.wikidata.org/prop/direct/P162,relation,producer,,relation
+http://www.wikidata.org/prop/direct/P1622,relation,P1622,,relation
+http://www.wikidata.org/prop/direct/P163,relation,P163,,relation
+http://www.wikidata.org/prop/direct/P1657,relation,film rating,,relation
+http://www.wikidata.org/prop/direct/P166,relation,P166,,relation
+http://www.wikidata.org/prop/direct/P1672,relation,P1672,,relation
+http://www.wikidata.org/prop/direct/P169,relation,P169,,relation
+http://www.wikidata.org/prop/direct/P17,relation,country,,relation
+http://www.wikidata.org/prop/direct/P170,relation,P170,,relation
+http://www.wikidata.org/prop/direct/P171,relation,P171,,relation
+http://www.wikidata.org/prop/direct/P1716,relation,P1716,,relation
+http://www.wikidata.org/prop/direct/P172,relation,P172,,relation
+http://www.wikidata.org/prop/direct/P175,relation,P175,,relation
+http://www.wikidata.org/prop/direct/P176,relation,P176,,relation
+http://www.wikidata.org/prop/direct/P177,relation,P177,,relation
+http://www.wikidata.org/prop/direct/P178,relation,P178,,relation
+http://www.wikidata.org/prop/direct/P179,relation,P179,,relation
+http://www.wikidata.org/prop/direct/P180,relation,P180,,relation
+http://www.wikidata.org/prop/direct/P1809,relation,P1809,,relation
+http://www.wikidata.org/prop/direct/P1830,relation,P1830,,relation
+http://www.wikidata.org/prop/direct/P184,relation,P184,,relation
+http://www.wikidata.org/prop/direct/P185,relation,P185,,relation
+http://www.wikidata.org/prop/direct/P1853,relation,P1853,,relation
+http://www.wikidata.org/prop/direct/P186,relation,P186,,relation
+http://www.wikidata.org/prop/direct/P1875,relation,P1875,,relation
+http://www.wikidata.org/prop/direct/P1877,relation,P1877,,relation
+http://www.wikidata.org/prop/direct/P1880,relation,P1880,,relation
+http://www.wikidata.org/prop/direct/P1884,relation,P1884,,relation
+http://www.wikidata.org/prop/direct/P1889,relation,P1889,,relation
+http://www.wikidata.org/prop/direct/P19,relation,place of birth,,relation
+http://www.wikidata.org/prop/direct/P190,relation,P190,,relation
+http://www.wikidata.org/prop/direct/P1906,relation,P1906,,relation
+http://www.wikidata.org/prop/direct/P1923,relation,P1923,,relation
+http://www.wikidata.org/prop/direct/P193,relation,P193,,relation
+http://www.wikidata.org/prop/direct/P194,relation,P194,,relation
+http://www.wikidata.org/prop/direct/P195,relation,P195,,relation
+http://www.wikidata.org/prop/direct/P1950,relation,P1950,,relation
+http://www.wikidata.org/prop/direct/P197,relation,P197,,relation
+http://www.wikidata.org/prop/direct/P1981,relation,P1981,,relation
+http://www.wikidata.org/prop/direct/P199,relation,P199,,relation
+http://www.wikidata.org/prop/direct/P1990,relation,P1990,,relation
+http://www.wikidata.org/prop/direct/P1995,relation,P1995,,relation
+http://www.wikidata.org/prop/direct/P1999,relation,P1999,,relation
+http://www.wikidata.org/prop/direct/P20,relation,place of death,,relation
+http://www.wikidata.org/prop/direct/P200,relation,P200,,relation
+http://www.wikidata.org/prop/direct/P205,relation,P205,,relation
+http://www.wikidata.org/prop/direct/P206,relation,P206,,relation
+http://www.wikidata.org/prop/direct/P2061,relation,P2061,,relation
+http://www.wikidata.org/prop/direct/P2079,relation,P2079,,relation
+http://www.wikidata.org/prop/direct/P208,relation,P208,,relation
+http://www.wikidata.org/prop/direct/P21,relation,gender,,relation
+http://www.wikidata.org/prop/direct/P210,relation,P210,,relation
+http://www.wikidata.org/prop/direct/P2176,relation,P2176,,relation
+http://www.wikidata.org/prop/direct/P2184,relation,P2184,,relation
+http://www.wikidata.org/prop/direct/P22,relation,P22,,relation
+http://www.wikidata.org/prop/direct/P2238,relation,P2238,,relation
+http://www.wikidata.org/prop/direct/P2283,relation,P2283,,relation
+http://www.wikidata.org/prop/direct/P2293,relation,P2293,,relation
+http://www.wikidata.org/prop/direct/P2341,relation,P2341,,relation
+http://www.wikidata.org/prop/direct/P2348,relation,P2348,,relation
+http://www.wikidata.org/prop/direct/P2358,relation,P2358,,relation
+http://www.wikidata.org/prop/direct/P2359,relation,P2359,,relation
+http://www.wikidata.org/prop/direct/P2360,relation,P2360,,relation
+http://www.wikidata.org/prop/direct/P2363,relation,P2363,,relation
+http://www.wikidata.org/prop/direct/P2365,relation,P2365,,relation
+http://www.wikidata.org/prop/direct/P237,relation,P237,,relation
+http://www.wikidata.org/prop/direct/P2388,relation,P2388,,relation
+http://www.wikidata.org/prop/direct/P2408,relation,P2408,,relation
+http://www.wikidata.org/prop/direct/P241,relation,P241,,relation
+http://www.wikidata.org/prop/direct/P2416,relation,P2416,,relation
+http://www.wikidata.org/prop/direct/P2438,relation,P2438,,relation
+http://www.wikidata.org/prop/direct/P25,relation,P25,,relation
+http://www.wikidata.org/prop/direct/P2505,relation,P2505,,relation
+http://www.wikidata.org/prop/direct/P2512,relation,P2512,,relation
+http://www.wikidata.org/prop/direct/P2515,relation,P2515,,relation
+http://www.wikidata.org/prop/direct/P2522,relation,P2522,,relation
+http://www.wikidata.org/prop/direct/P2541,relation,P2541,,relation
+http://www.wikidata.org/prop/direct/P2546,relation,P2546,,relation
+http://www.wikidata.org/prop/direct/P2550,relation,P2550,,relation
+http://www.wikidata.org/prop/direct/P2554,relation,P2554,,relation
+http://www.wikidata.org/prop/direct/P2563,relation,P2563,,relation
+http://www.wikidata.org/prop/direct/P2564,relation,P2564,,relation
+http://www.wikidata.org/prop/direct/P2578,relation,P2578,,relation
+http://www.wikidata.org/prop/direct/P2579,relation,P2579,,relation
+http://www.wikidata.org/prop/direct/P2587,relation,P2587,,relation
+http://www.wikidata.org/prop/direct/P2596,relation,P2596,,relation
+http://www.wikidata.org/prop/direct/P26,relation,P26,,relation
+http://www.wikidata.org/prop/direct/P2614,relation,P2614,,relation
+http://www.wikidata.org/prop/direct/P2629,relation,P2629,,relation
+http://www.wikidata.org/prop/direct/P2634,relation,P2634,,relation
+http://www.wikidata.org/prop/direct/P2637,relation,P2637,,relation
+http://www.wikidata.org/prop/direct/P264,relation,P264,,relation
+http://www.wikidata.org/prop/direct/P2643,relation,P2643,,relation
+http://www.wikidata.org/prop/direct/P2650,relation,P2650,,relation
+http://www.wikidata.org/prop/direct/P2652,relation,P2652,,relation
+http://www.wikidata.org/prop/direct/P2670,relation,P2670,,relation
+http://www.wikidata.org/prop/direct/P2684,relation,P2684,,relation
+http://www.wikidata.org/prop/direct/P27,relation,nationality,,relation
+http://www.wikidata.org/prop/direct/P272,relation,production company,,relation
+http://www.wikidata.org/prop/direct/P2737,relation,P2737,,relation
+http://www.wikidata.org/prop/direct/P2747,relation,P2747,,relation
+http://www.wikidata.org/prop/direct/P275,relation,P275,,relation
+http://www.wikidata.org/prop/direct/P2756,relation,P2756,,relation
+http://www.wikidata.org/prop/direct/P2758,relation,P2758,,relation
+http://www.wikidata.org/prop/direct/P276,relation,P276,,relation
+http://www.wikidata.org/prop/direct/P2789,relation,P2789,,relation
+http://www.wikidata.org/prop/direct/P279,relation,subclass of,,relation
+http://www.wikidata.org/prop/direct/P282,relation,P282,,relation
+http://www.wikidata.org/prop/direct/P2852,relation,P2852,,relation
+http://www.wikidata.org/prop/direct/P2853,relation,P2853,,relation
+http://www.wikidata.org/prop/direct/P286,relation,P286,,relation
+http://www.wikidata.org/prop/direct/P2860,relation,P2860,,relation
+http://www.wikidata.org/prop/direct/P2868,relation,P2868,,relation
+http://www.wikidata.org/prop/direct/P287,relation,P287,,relation
+http://www.wikidata.org/prop/direct/P289,relation,P289,,relation
+http://www.wikidata.org/prop/direct/P2894,relation,P2894,,relation
+http://www.wikidata.org/prop/direct/P291,relation,P291,,relation
+http://www.wikidata.org/prop/direct/P2922,relation,P2922,,relation
+http://www.wikidata.org/prop/direct/P2925,relation,P2925,,relation
+http://www.wikidata.org/prop/direct/P2936,relation,P2936,,relation
+http://www.wikidata.org/prop/direct/P2989,relation,P2989,,relation
+http://www.wikidata.org/prop/direct/P30,relation,P30,,relation
+http://www.wikidata.org/prop/direct/P3018,relation,P3018,,relation
+http://www.wikidata.org/prop/direct/P306,relation,P306,,relation
+http://www.wikidata.org/prop/direct/P3075,relation,P3075,,relation
+http://www.wikidata.org/prop/direct/P3091,relation,P3091,,relation
+http://www.wikidata.org/prop/direct/P3092,relation,P3092,,relation
+http://www.wikidata.org/prop/direct/P3095,relation,P3095,,relation
+http://www.wikidata.org/prop/direct/P31,relation,is a,,relation
+http://www.wikidata.org/prop/direct/P3103,relation,P3103,,relation
+http://www.wikidata.org/prop/direct/P3150,relation,P3150,,relation
+http://www.wikidata.org/prop/direct/P3156,relation,P3156,,relation
+http://www.wikidata.org/prop/direct/P3161,relation,P3161,,relation
+http://www.wikidata.org/prop/direct/P3174,relation,P3174,,relation
+http://www.wikidata.org/prop/direct/P3179,relation,P3179,,relation
+http://www.wikidata.org/prop/direct/P3216,relation,P3216,,relation
+http://www.wikidata.org/prop/direct/P3275,relation,P3275,,relation
+http://www.wikidata.org/prop/direct/P3300,relation,P3300,,relation
+http://www.wikidata.org/prop/direct/P3301,relation,P3301,,relation
+http://www.wikidata.org/prop/direct/P3306,relation,P3306,,relation
+http://www.wikidata.org/prop/direct/P3320,relation,P3320,,relation
+http://www.wikidata.org/prop/direct/P3342,relation,P3342,,relation
+http://www.wikidata.org/prop/direct/P3373,relation,P3373,,relation
+http://www.wikidata.org/prop/direct/P3402,relation,P3402,,relation
+http://www.wikidata.org/prop/direct/P3403,relation,P3403,,relation
+http://www.wikidata.org/prop/direct/P3428,relation,P3428,,relation
+http://www.wikidata.org/prop/direct/P3438,relation,P3438,,relation
+http://www.wikidata.org/prop/direct/P344,relation,P344,,relation
+http://www.wikidata.org/prop/direct/P3448,relation,P3448,,relation
+http://www.wikidata.org/prop/direct/P3461,relation,P3461,,relation
+http://www.wikidata.org/prop/direct/P35,relation,P35,,relation
+http://www.wikidata.org/prop/direct/P355,relation,P355,,relation
+http://www.wikidata.org/prop/direct/P358,relation,P358,,relation
+http://www.wikidata.org/prop/direct/P36,relation,P36,,relation
+http://www.wikidata.org/prop/direct/P3602,relation,P3602,,relation
+http://www.wikidata.org/prop/direct/P361,relation,P361,,relation
+http://www.wikidata.org/prop/direct/P364,relation,original language,,relation
+http://www.wikidata.org/prop/direct/P3650,relation,P3650,,relation
+http://www.wikidata.org/prop/direct/P366,relation,P366,,relation
+http://www.wikidata.org/prop/direct/P37,relation,P37,,relation
+http://www.wikidata.org/prop/direct/P371,relation,P371,,relation
+http://www.wikidata.org/prop/direct/P3712,relation,P3712,,relation
+http://www.wikidata.org/prop/direct/P3716,relation,P3716,,relation
+http://www.wikidata.org/prop/direct/P38,relation,P38,,relation
+http://www.wikidata.org/prop/direct/P3803,relation,P3803,,relation
+http://www.wikidata.org/prop/direct/P3818,relation,P3818,,relation
+http://www.wikidata.org/prop/direct/P3823,relation,P3823,,relation
+http://www.wikidata.org/prop/direct/P3828,relation,P3828,,relation
+http://www.wikidata.org/prop/direct/P3834,relation,P3834,,relation
+http://www.wikidata.org/prop/direct/P3842,relation,P3842,,relation
+http://www.wikidata.org/prop/direct/P39,relation,P39,,relation
+http://www.wikidata.org/prop/direct/P3919,relation,P3919,,relation
+http://www.wikidata.org/prop/direct/P3938,relation,P3938,,relation
+http://www.wikidata.org/prop/direct/P397,relation,P397,,relation
+http://www.wikidata.org/prop/direct/P398,relation,P398,,relation
+http://www.wikidata.org/prop/direct/P3989,relation,P3989,,relation
+http://www.wikidata.org/prop/direct/P40,relation,P40,,relation
+http://www.wikidata.org/prop/direct/P400,relation,P400,,relation
+http://www.wikidata.org/prop/direct/P404,relation,P404,,relation
+http://www.wikidata.org/prop/direct/P406,relation,P406,,relation
+http://www.wikidata.org/prop/direct/P407,relation,P407,,relation
+http://www.wikidata.org/prop/direct/P408,relation,P408,,relation
+http://www.wikidata.org/prop/direct/P4082,relation,P4082,,relation
+http://www.wikidata.org/prop/direct/P410,relation,P410,,relation
+http://www.wikidata.org/prop/direct/P411,relation,P411,,relation
+http://www.wikidata.org/prop/direct/P412,relation,P412,,relation
+http://www.wikidata.org/prop/direct/P413,relation,P413,,relation
+http://www.wikidata.org/prop/direct/P4132,relation,P4132,,relation
+http://www.wikidata.org/prop/direct/P4151,relation,P4151,,relation
+http://www.wikidata.org/prop/direct/P417,relation,P417,,relation
+http://www.wikidata.org/prop/direct/P418,relation,P418,,relation
+http://www.wikidata.org/prop/direct/P4185,relation,P4185,,relation
+http://www.wikidata.org/prop/direct/P421,relation,P421,,relation
+http://www.wikidata.org/prop/direct/P423,relation,P423,,relation
+http://www.wikidata.org/prop/direct/P425,relation,P425,,relation
+http://www.wikidata.org/prop/direct/P4312,relation,P4312,,relation
+http://www.wikidata.org/prop/direct/P437,relation,P437,,relation
+http://www.wikidata.org/prop/direct/P4437,relation,P4437,,relation
+http://www.wikidata.org/prop/direct/P449,relation,P449,,relation
+http://www.wikidata.org/prop/direct/P450,relation,P450,,relation
+http://www.wikidata.org/prop/direct/P451,relation,P451,,relation
+http://www.wikidata.org/prop/direct/P452,relation,P452,,relation
+http://www.wikidata.org/prop/direct/P4552,relation,P4552,,relation
+http://www.wikidata.org/prop/direct/P4584,relation,P4584,,relation
+http://www.wikidata.org/prop/direct/P460,relation,P460,,relation
+http://www.wikidata.org/prop/direct/P4608,relation,P4608,,relation
+http://www.wikidata.org/prop/direct/P461,relation,P461,,relation
+http://www.wikidata.org/prop/direct/P4614,relation,P4614,,relation
+http://www.wikidata.org/prop/direct/P462,relation,P462,,relation
+http://www.wikidata.org/prop/direct/P463,relation,P463,,relation
+http://www.wikidata.org/prop/direct/P4647,relation,P4647,,relation
+http://www.wikidata.org/prop/direct/P466,relation,P466,,relation
+http://www.wikidata.org/prop/direct/P4675,relation,P4675,,relation
+http://www.wikidata.org/prop/direct/P47,relation,P47,,relation
+http://www.wikidata.org/prop/direct/P4743,relation,P4743,,relation
+http://www.wikidata.org/prop/direct/P479,relation,P479,,relation
+http://www.wikidata.org/prop/direct/P4805,relation,P4805,,relation
+http://www.wikidata.org/prop/direct/P483,relation,P483,,relation
+http://www.wikidata.org/prop/direct/P485,relation,P485,,relation
+http://www.wikidata.org/prop/direct/P488,relation,P488,,relation
+http://www.wikidata.org/prop/direct/P4908,relation,P4908,,relation
+http://www.wikidata.org/prop/direct/P495,relation,country of origin,,relation
+http://www.wikidata.org/prop/direct/P4969,relation,P4969,,relation
+http://www.wikidata.org/prop/direct/P50,relation,author,,relation
+http://www.wikidata.org/prop/direct/P5021,relation,P5021,,relation
+http://www.wikidata.org/prop/direct/P5025,relation,P5025,,relation
+http://www.wikidata.org/prop/direct/P5028,relation,P5028,,relation
+http://www.wikidata.org/prop/direct/P5056,relation,P5056,,relation
+http://www.wikidata.org/prop/direct/P5072,relation,P5072,,relation
+http://www.wikidata.org/prop/direct/P509,relation,P509,,relation
+http://www.wikidata.org/prop/direct/P5096,relation,P5096,,relation
+http://www.wikidata.org/prop/direct/P5109,relation,P5109,,relation
+http://www.wikidata.org/prop/direct/P511,relation,P511,,relation
+http://www.wikidata.org/prop/direct/P5110,relation,P5110,,relation
+http://www.wikidata.org/prop/direct/P512,relation,P512,,relation
+http://www.wikidata.org/prop/direct/P5126,relation,P5126,,relation
+http://www.wikidata.org/prop/direct/P5150,relation,P5150,,relation
+http://www.wikidata.org/prop/direct/P5152,relation,P5152,,relation
+http://www.wikidata.org/prop/direct/P520,relation,P520,,relation
+http://www.wikidata.org/prop/direct/P5201,relation,P5201,,relation
+http://www.wikidata.org/prop/direct/P521,relation,P521,,relation
+http://www.wikidata.org/prop/direct/P527,relation,P527,,relation
+http://www.wikidata.org/prop/direct/P53,relation,P53,,relation
+http://www.wikidata.org/prop/direct/P530,relation,P530,,relation
+http://www.wikidata.org/prop/direct/P5323,relation,P5323,,relation
+http://www.wikidata.org/prop/direct/P533,relation,P533,,relation
+http://www.wikidata.org/prop/direct/P5389,relation,P5389,,relation
+http://www.wikidata.org/prop/direct/P54,relation,P54,,relation
+http://www.wikidata.org/prop/direct/P547,relation,P547,,relation
+http://www.wikidata.org/prop/direct/P551,relation,P551,,relation
+http://www.wikidata.org/prop/direct/P552,relation,P552,,relation
+http://www.wikidata.org/prop/direct/P559,relation,P559,,relation
+http://www.wikidata.org/prop/direct/P5642,relation,P5642,,relation
+http://www.wikidata.org/prop/direct/P5658,relation,P5658,,relation
+http://www.wikidata.org/prop/direct/P57,relation,director,,relation
+http://www.wikidata.org/prop/direct/P5707,relation,P5707,,relation
+http://www.wikidata.org/prop/direct/P58,relation,screenwriter,,relation
+http://www.wikidata.org/prop/direct/P5800,relation,P5800,,relation
+http://www.wikidata.org/prop/direct/P5816,relation,P5816,,relation
+http://www.wikidata.org/prop/direct/P5817,relation,P5817,,relation
+http://www.wikidata.org/prop/direct/P5869,relation,P5869,,relation
+http://www.wikidata.org/prop/direct/P5940,relation,P5940,,relation
+http://www.wikidata.org/prop/direct/P5970,relation,P5970,,relation
+http://www.wikidata.org/prop/direct/P598,relation,P598,,relation
+http://www.wikidata.org/prop/direct/P6,relation,P6,,relation
+http://www.wikidata.org/prop/direct/P607,relation,P607,,relation
+http://www.wikidata.org/prop/direct/P6087,relation,P6087,,relation
+http://www.wikidata.org/prop/direct/P61,relation,P61,,relation
+http://www.wikidata.org/prop/direct/P610,relation,P610,,relation
+http://www.wikidata.org/prop/direct/P6106,relation,P6106,,relation
+http://www.wikidata.org/prop/direct/P611,relation,P611,,relation
+http://www.wikidata.org/prop/direct/P6166,relation,P6166,,relation
+http://www.wikidata.org/prop/direct/P6275,relation,P6275,,relation
+http://www.wikidata.org/prop/direct/P629,relation,P629,,relation
+http://www.wikidata.org/prop/direct/P6291,relation,P6291,,relation
+http://www.wikidata.org/prop/direct/P631,relation,P631,,relation
+http://www.wikidata.org/prop/direct/P6364,relation,P6364,,relation
+http://www.wikidata.org/prop/direct/P6379,relation,P6379,,relation
+http://www.wikidata.org/prop/direct/P641,relation,P641,,relation
+http://www.wikidata.org/prop/direct/P647,relation,P647,,relation
+http://www.wikidata.org/prop/direct/P6477,relation,P6477,,relation
+http://www.wikidata.org/prop/direct/P655,relation,P655,,relation
+http://www.wikidata.org/prop/direct/P658,relation,P658,,relation
+http://www.wikidata.org/prop/direct/P66,relation,P66,,relation
+http://www.wikidata.org/prop/direct/P664,relation,P664,,relation
+http://www.wikidata.org/prop/direct/P6658,relation,P6658,,relation
+http://www.wikidata.org/prop/direct/P669,relation,P669,,relation
+http://www.wikidata.org/prop/direct/P674,relation,P674,,relation
+http://www.wikidata.org/prop/direct/P6758,relation,P6758,,relation
+http://www.wikidata.org/prop/direct/P676,relation,P676,,relation
+http://www.wikidata.org/prop/direct/P6872,relation,P6872,,relation
+http://www.wikidata.org/prop/direct/P6885,relation,P6885,,relation
+http://www.wikidata.org/prop/direct/P6886,relation,P6886,,relation
+http://www.wikidata.org/prop/direct/P69,relation,P69,,relation
+http://www.wikidata.org/prop/direct/P6942,relation,P6942,,relation
+http://www.wikidata.org/prop/direct/P6962,relation,P6962,,relation
+http://www.wikidata.org/prop/direct/P6978,relation,P6978,,relation
+http://www.wikidata.org/prop/direct/P7047,relation,P7047,,relation
+http://www.wikidata.org/prop/direct/P706,relation,P706,,relation
+http://www.wikidata.org/prop/direct/P708,relation,P708,,relation
+http://www.wikidata.org/prop/direct/P710,relation,P710,,relation
+http://www.wikidata.org/prop/direct/P7137,relation,P7137,,relation
+http://www.wikidata.org/prop/direct/P7153,relation,P7153,,relation
+http://www.wikidata.org/prop/direct/P725,relation,P725,,relation
+http://www.wikidata.org/prop/direct/P7327,relation,P7327,,relation
+http://www.wikidata.org/prop/direct/P734,relation,P734,,relation
+http://www.wikidata.org/prop/direct/P735,relation,P735,,relation
+http://www.wikidata.org/prop/direct/P736,relation,P736,,relation
+http://www.wikidata.org/prop/direct/P737,relation,P737,,relation
+http://www.wikidata.org/prop/direct/P740,relation,P740,,relation
+http://www.wikidata.org/prop/direct/P747,relation,P747,,relation
+http://www.wikidata.org/prop/direct/P749,relation,P749,,relation
+http://www.wikidata.org/prop/direct/P750,relation,distributor,,relation
+http://www.wikidata.org/prop/direct/P7573,relation,P7573,,relation
+http://www.wikidata.org/prop/direct/P767,relation,P767,,relation
+http://www.wikidata.org/prop/direct/P769,relation,P769,,relation
+http://www.wikidata.org/prop/direct/P7763,relation,P7763,,relation
+http://www.wikidata.org/prop/direct/P7779,relation,P7779,,relation
+http://www.wikidata.org/prop/direct/P78,relation,P78,,relation
+http://www.wikidata.org/prop/direct/P780,relation,P780,,relation
+http://www.wikidata.org/prop/direct/P793,relation,P793,,relation
+http://www.wikidata.org/prop/direct/P7937,relation,P7937,,relation
+http://www.wikidata.org/prop/direct/P7938,relation,P7938,,relation
+http://www.wikidata.org/prop/direct/P7959,relation,P7959,,relation
+http://www.wikidata.org/prop/direct/P797,relation,P797,,relation
+http://www.wikidata.org/prop/direct/P800,relation,P800,,relation
+http://www.wikidata.org/prop/direct/P802,relation,P802,,relation
+http://www.wikidata.org/prop/direct/P803,relation,P803,,relation
+http://www.wikidata.org/prop/direct/P81,relation,P81,,relation
+http://www.wikidata.org/prop/direct/P812,relation,P812,,relation
+http://www.wikidata.org/prop/direct/P8138,relation,P8138,,relation
+http://www.wikidata.org/prop/direct/P825,relation,P825,,relation
+http://www.wikidata.org/prop/direct/P826,relation,P826,,relation
+http://www.wikidata.org/prop/direct/P828,relation,P828,,relation
+http://www.wikidata.org/prop/direct/P832,relation,P832,,relation
+http://www.wikidata.org/prop/direct/P8324,relation,P8324,,relation
+http://www.wikidata.org/prop/direct/P833,relation,P833,,relation
+http://www.wikidata.org/prop/direct/P8345,relation,P8345,,relation
+http://www.wikidata.org/prop/direct/P837,relation,P837,,relation
+http://www.wikidata.org/prop/direct/P8371,relation,P8371,,relation
+http://www.wikidata.org/prop/direct/P84,relation,P84,,relation
+http://www.wikidata.org/prop/direct/P840,relation,P840,,relation
+http://www.wikidata.org/prop/direct/P841,relation,P841,,relation
+http://www.wikidata.org/prop/direct/P8411,relation,P8411,,relation
+http://www.wikidata.org/prop/direct/P85,relation,P85,,relation
+http://www.wikidata.org/prop/direct/P852,relation,P852,,relation
+http://www.wikidata.org/prop/direct/P859,relation,P859,,relation
+http://www.wikidata.org/prop/direct/P86,relation,composer,,relation
+http://www.wikidata.org/prop/direct/P868,relation,P868,,relation
+http://www.wikidata.org/prop/direct/P8693,relation,P8693,,relation
+http://www.wikidata.org/prop/direct/P87,relation,P87,,relation
+http://www.wikidata.org/prop/direct/P870,relation,P870,,relation
+http://www.wikidata.org/prop/direct/P88,relation,P88,,relation
+http://www.wikidata.org/prop/direct/P8839,relation,P8839,,relation
+http://www.wikidata.org/prop/direct/P8852,relation,P8852,,relation
+http://www.wikidata.org/prop/direct/P8874,relation,P8874,,relation
+http://www.wikidata.org/prop/direct/P8889,relation,P8889,,relation
+http://www.wikidata.org/prop/direct/P9071,relation,P9071,,relation
+http://www.wikidata.org/prop/direct/P908,relation,P908,,relation
+http://www.wikidata.org/prop/direct/P9086,relation,P9086,,relation
+http://www.wikidata.org/prop/direct/P91,relation,P91,,relation
+http://www.wikidata.org/prop/direct/P912,relation,P912,,relation
+http://www.wikidata.org/prop/direct/P9139,relation,P9139,,relation
+http://www.wikidata.org/prop/direct/P914,relation,P914,,relation
+http://www.wikidata.org/prop/direct/P915,relation,P915,,relation
+http://www.wikidata.org/prop/direct/P921,relation,P921,,relation
+http://www.wikidata.org/prop/direct/P9215,relation,P9215,,relation
+http://www.wikidata.org/prop/direct/P9234,relation,P9234,,relation
+http://www.wikidata.org/prop/direct/P9235,relation,P9235,,relation
+http://www.wikidata.org/prop/direct/P924,relation,P924,,relation
+http://www.wikidata.org/prop/direct/P931,relation,P931,,relation
+http://www.wikidata.org/prop/direct/P937,relation,P937,,relation
+http://www.wikidata.org/prop/direct/P941,relation,P941,,relation
+http://www.wikidata.org/prop/direct/P9419,relation,P9419,,relation
+http://www.wikidata.org/prop/direct/P942,relation,P942,,relation
+http://www.wikidata.org/prop/direct/P945,relation,P945,,relation
+http://www.wikidata.org/prop/direct/P9493,relation,P9493,,relation
+http://www.wikidata.org/prop/direct/P9600,relation,P9600,,relation
+http://www.wikidata.org/prop/direct/P9652,relation,P9652,,relation
+http://www.wikidata.org/prop/direct/P97,relation,P97,,relation
+http://www.wikidata.org/prop/direct/P9714,relation,P9714,,relation
+http://www.wikidata.org/prop/direct/P974,relation,P974,,relation
+http://www.wikidata.org/prop/direct/P98,relation,P98,,relation
+http://www.wikidata.org/prop/direct/P9899,relation,P9899,,relation
+http://www.wikidata.org/prop/direct/P127,relation,owned by,en,relation
+http://www.wikidata.org/prop/direct/P3818,relation,KMRB film rating,en,relation
+http://www.wikidata.org/prop/direct/P8411,relation,set in environment,en,relation
+http://www.wikidata.org/prop/direct/P7763,relation,copyright status as a creator,en,relation
+http://www.wikidata.org/prop/direct/P3103,relation,has tense,en,relation
+http://www.wikidata.org/prop/direct/P1546,relation,motto,en,relation
+http://www.wikidata.org/prop/direct/P2358,relation,praenomen,en,relation
+http://www.wikidata.org/prop/direct/P6885,relation,historical region,en,relation
+http://www.wikidata.org/prop/direct/P3179,relation,territory overlaps,en,relation
+http://www.wikidata.org/prop/direct/P1074,relation,fictional or mythical analog of,en,relation
+http://www.wikidata.org/prop/direct/P551,relation,residence,en,relation
+http://www.wikidata.org/prop/direct/P291,relation,place of publication,en,relation
+http://www.wikidata.org/prop/direct/P2758,relation,CNC film rating (France),en,relation
+http://www.wikidata.org/prop/direct/P4151,relation,game mechanics,en,relation
+http://www.wikidata.org/prop/direct/P3161,relation,has grammatical mood,en,relation
+http://www.wikidata.org/prop/direct/P1431,relation,executive producer,en,relation
+http://www.wikidata.org/prop/direct/P6758,relation,supported sports team,en,relation
+http://www.wikidata.org/prop/direct/P156,relation,followed by,en,relation
+http://www.wikidata.org/prop/direct/P1376,relation,capital of,en,relation
+http://www.wikidata.org/prop/direct/P2522,relation,competition won,en,relation
+http://www.wikidata.org/prop/direct/P186,relation,made from material,en,relation
+http://www.wikidata.org/prop/direct/P4437,relation,FPB rating,en,relation
+http://www.wikidata.org/prop/direct/P166,relation,award received,en,relation
+http://www.wikidata.org/prop/direct/P3919,relation,contributed to creative work,en,relation
+http://www.wikidata.org/prop/direct/P5126,relation,assistant director,en,relation
+http://www.wikidata.org/prop/direct/P7779,relation,military unit,en,relation
+http://www.wikidata.org/prop/direct/P1552,relation,has characteristic,en,relation
+http://www.wikidata.org/prop/direct/P10741,relation,dance style,en,relation
+http://www.wikidata.org/prop/direct/P1018,relation,language regulatory body,en,relation
+http://www.wikidata.org/prop/direct/P1038,relation,relative,en,relation
+http://www.wikidata.org/prop/direct/P8839,relation,hairstyle / hairlength,en,relation
+http://www.wikidata.org/prop/direct/P19,relation,place of birth,en,relation
+http://www.wikidata.org/prop/direct/P664,relation,organizer,en,relation
+http://www.wikidata.org/prop/direct/P200,relation,inflows,en,relation
+http://www.wikidata.org/prop/direct/P825,relation,dedicated to,en,relation
+http://www.wikidata.org/prop/direct/P735,relation,given name,en,relation
+http://www.wikidata.org/prop/direct/P53,relation,family,en,relation
+http://www.wikidata.org/prop/direct/P1040,relation,film editor,en,relation
+http://www.wikidata.org/prop/direct/P4969,relation,derivative work,en,relation
+http://www.wikidata.org/prop/direct/P7959,relation,historic county,en,relation
+http://www.wikidata.org/prop/direct/P1981,relation,FSK film rating,en,relation
+http://www.wikidata.org/prop/direct/P20,relation,place of death,en,relation
+http://www.wikidata.org/prop/direct/P5816,relation,state of conservation,en,relation
+http://www.wikidata.org/prop/direct/P404,relation,game mode,en,relation
+http://www.wikidata.org/prop/direct/P1071,relation,location of creation,en,relation
+http://www.wikidata.org/prop/direct/P5970,relation,Medierådet rating,en,relation
+http://www.wikidata.org/prop/direct/P5110,relation,has grammatical person,en,relation
+http://www.wikidata.org/prop/direct/P178,relation,developer,en,relation
+http://www.wikidata.org/prop/direct/P4082,relation,captured with,en,relation
+http://www.wikidata.org/prop/direct/P12933,relation,"relates to sustainable development goal, target or indicator",en,relation
+http://www.wikidata.org/prop/direct/P1366,relation,replaced by,en,relation
+http://www.wikidata.org/prop/direct/P1445,relation,fictional universe described in,en,relation
+http://www.wikidata.org/prop/direct/P9493,relation,artist files at,en,relation
+http://www.wikidata.org/prop/direct/P2789,relation,connects with,en,relation
+http://www.wikidata.org/prop/direct/P2546,relation,sidekick of,en,relation
+http://www.wikidata.org/prop/direct/P1532,relation,country for sport,en,relation
+http://www.wikidata.org/prop/direct/P162,relation,producer,en,relation
+http://www.wikidata.org/prop/direct/P398,relation,child astronomical body,en,relation
+http://www.wikidata.org/prop/direct/P460,relation,said to be the same as,en,relation
+http://www.wikidata.org/prop/direct/P725,relation,voice actor,en,relation
+http://www.wikidata.org/prop/direct/P2563,relation,superhuman feature or ability,en,relation
+http://www.wikidata.org/prop/direct/P521,relation,scheduled service destination,en,relation
+http://www.wikidata.org/prop/direct/P110,relation,illustrator,en,relation
+http://www.wikidata.org/prop/direct/P195,relation,collection,en,relation
+http://www.wikidata.org/prop/direct/P11799,relation,alternate universe counterpart,en,relation
+http://www.wikidata.org/prop/direct/P4552,relation,mountain range,en,relation
+http://www.wikidata.org/prop/direct/P2650,relation,interested in,en,relation
+http://www.wikidata.org/prop/direct/P1950,relation,second family name in Spanish name,en,relation
+http://www.wikidata.org/prop/direct/P3275,relation,storyboard artist,en,relation
+http://www.wikidata.org/prop/direct/P2341,relation,indigenous to,en,relation
+http://www.wikidata.org/prop/direct/P2079,relation,fabrication method,en,relation
+http://www.wikidata.org/prop/direct/P10888,relation,contains the statistical territorial entity,en,relation
+http://www.wikidata.org/prop/direct/P9235,relation,seismic classification,en,relation
+http://www.wikidata.org/prop/direct/P1080,relation,from narrative universe,en,relation
+http://www.wikidata.org/prop/direct/P54,relation,member of sports team,en,relation
+http://www.wikidata.org/prop/direct/P345,relation,IMDb ID,en,relation
+http://www.wikidata.org/prop/direct/P3716,relation,social classification,en,relation
+http://www.wikidata.org/prop/direct/P400,relation,platform,en,relation
+http://www.wikidata.org/prop/direct/P1589,relation,lowest point,en,relation
+http://www.wikidata.org/prop/direct/P2360,relation,intended public,en,relation
+http://www.wikidata.org/prop/direct/P66,relation,ancestral home,en,relation
+http://www.wikidata.org/prop/direct/P607,relation,participated in conflict,en,relation
+http://www.wikidata.org/prop/direct/P169,relation,chief executive officer,en,relation
+http://www.wikidata.org/prop/direct/P40,relation,child,en,relation
+http://www.wikidata.org/prop/direct/P914,relation,USK rating,en,relation
+http://www.wikidata.org/prop/direct/P9652,relation,personality trait of fictional character,en,relation
+http://www.wikidata.org/prop/direct/P122,relation,basic form of government,en,relation
+http://www.wikidata.org/prop/direct/P87,relation,librettist,en,relation
+http://www.wikidata.org/prop/direct/P1344,relation,participant in,en,relation
+http://www.wikidata.org/prop/direct/P413,relation,position played on team / speciality,en,relation
+http://www.wikidata.org/prop/direct/P802,relation,student,en,relation
+http://www.wikidata.org/prop/direct/P1853,relation,blood type,en,relation
+http://www.wikidata.org/prop/direct/P1884,relation,hair color,en,relation
+http://www.wikidata.org/prop/direct/P8371,relation,"references work, tradition or theory",en,relation
+http://www.wikidata.org/prop/direct/P3095,relation,practiced by,en,relation
+http://www.wikidata.org/prop/direct/P31,relation,instance of,en,relation
+http://www.wikidata.org/prop/direct/P3842,relation,located in the present-day administrative territorial entity,en,relation
+http://www.wikidata.org/prop/direct/P5152,relation,KAVI rating,en,relation
+http://www.wikidata.org/prop/direct/P3650,relation,JMK film rating,en,relation
+http://www.wikidata.org/prop/direct/P112,relation,founded by,en,relation
+http://www.wikidata.org/prop/direct/P289,relation,vessel class,en,relation
+http://www.wikidata.org/prop/direct/P3300,relation,musical conductor,en,relation
+http://www.wikidata.org/prop/direct/P3989,relation,members have occupation,en,relation
+http://www.wikidata.org/prop/direct/P852,relation,ESRB rating,en,relation
+http://www.wikidata.org/prop/direct/P1387,relation,political alignment,en,relation
+http://www.wikidata.org/prop/direct/P937,relation,work location,en,relation
+http://www.wikidata.org/prop/direct/P176,relation,manufacturer,en,relation
+http://www.wikidata.org/prop/direct/P5150,relation,IGAC rating,en,relation
+http://www.wikidata.org/prop/direct/P1455,relation,list of works,en,relation
+http://www.wikidata.org/prop/direct/P1429,relation,has pet,en,relation
+http://www.wikidata.org/prop/direct/P4908,relation,season,en,relation
+http://www.wikidata.org/prop/direct/P170,relation,creator,en,relation
+http://www.wikidata.org/prop/direct/P2293,relation,genetic association,en,relation
+http://www.wikidata.org/prop/direct/P2515,relation,costume designer,en,relation
+http://www.wikidata.org/prop/direct/P1327,relation,partner in business or sport,en,relation
+http://www.wikidata.org/prop/direct/P6,relation,head of government,en,relation
+http://www.wikidata.org/prop/direct/P184,relation,doctoral advisor,en,relation
+http://www.wikidata.org/prop/direct/P7573,relation,IFCO rating,en,relation
+http://www.wikidata.org/prop/direct/P2637,relation,RARS rating,en,relation
+http://www.wikidata.org/prop/direct/P479,relation,input device,en,relation
+http://www.wikidata.org/prop/direct/P674,relation,characters,en,relation
+http://www.wikidata.org/prop/direct/P275,relation,copyright license,en,relation
+http://www.wikidata.org/prop/direct/P1313,relation,office held by head of government,en,relation
+http://www.wikidata.org/prop/direct/P58,relation,screenwriter,en,relation
+http://www.wikidata.org/prop/direct/P193,relation,main building contractor,en,relation
+http://www.wikidata.org/prop/direct/P6942,relation,animator,en,relation
+http://www.wikidata.org/prop/direct/P5642,relation,risk factor,en,relation
+http://www.wikidata.org/prop/direct/P452,relation,industry,en,relation
+http://www.wikidata.org/prop/direct/P3373,relation,sibling,en,relation
+http://www.wikidata.org/prop/direct/P4743,relation,animal breed,en,relation
+http://www.wikidata.org/prop/direct/P941,relation,inspired by,en,relation
+http://www.wikidata.org/prop/direct/P826,relation,tonality,en,relation
+http://www.wikidata.org/prop/direct/P5389,relation,permanent resident of,en,relation
+http://www.wikidata.org/prop/direct/P2438,relation,narrator,en,relation
+http://www.wikidata.org/prop/direct/P1622,relation,driving side,en,relation
+http://www.wikidata.org/prop/direct/P3402,relation,CNC film rating (Romania),en,relation
+http://www.wikidata.org/prop/direct/P9419,relation,personal library at,en,relation
+http://www.wikidata.org/prop/direct/P6872,relation,has written for,en,relation
+http://www.wikidata.org/prop/direct/P1906,relation,office held by head of state,en,relation
+http://www.wikidata.org/prop/direct/P655,relation,translator,en,relation
+http://www.wikidata.org/prop/direct/P1716,relation,brand,en,relation
+http://www.wikidata.org/prop/direct/P547,relation,commemorates,en,relation
+http://www.wikidata.org/prop/direct/P1999,relation,UNESCO language status,en,relation
+http://www.wikidata.org/prop/direct/P2554,relation,production designer,en,relation
+http://www.wikidata.org/prop/direct/P2614,relation,World Heritage criteria,en,relation
+http://www.wikidata.org/prop/direct/P1066,relation,student of,en,relation
+http://www.wikidata.org/prop/direct/P199,relation,organizational divisions,en,relation
+http://www.wikidata.org/prop/direct/P924,relation,possible treatment,en,relation
+http://www.wikidata.org/prop/direct/P2989,relation,has grammatical case,en,relation
+http://www.wikidata.org/prop/direct/P461,relation,opposite of,en,relation
+http://www.wikidata.org/prop/direct/P6275,relation,copyright representative,en,relation
+http://www.wikidata.org/prop/direct/P527,relation,has part(s),en,relation
+http://www.wikidata.org/prop/direct/P6106,relation,uses capitalization for,en,relation
+http://www.wikidata.org/prop/direct/P3342,relation,significant person,en,relation
+http://www.wikidata.org/prop/direct/P287,relation,designed by,en,relation
+http://www.wikidata.org/prop/direct/P9086,relation,BAMID film rating,en,relation
+http://www.wikidata.org/prop/direct/P868,relation,foods traditionally associated,en,relation
+http://www.wikidata.org/prop/direct/P27,relation,country of citizenship,en,relation
+http://www.wikidata.org/prop/direct/P9139,relation,first family name in Portuguese name,en,relation
+http://www.wikidata.org/prop/direct/P577,relation,publication date,en,relation
+http://www.wikidata.org/prop/direct/P710,relation,participant,en,relation
+http://www.wikidata.org/prop/direct/P5025,relation,gens,en,relation
+http://www.wikidata.org/prop/direct/P2852,relation,emergency phone number,en,relation
+http://www.wikidata.org/prop/direct/P1304,relation,central bank,en,relation
+http://www.wikidata.org/prop/direct/P88,relation,commissioned by,en,relation
+http://www.wikidata.org/prop/direct/P179,relation,part of the series,en,relation
+http://www.wikidata.org/prop/direct/P208,relation,executive body,en,relation
+http://www.wikidata.org/prop/direct/P859,relation,sponsor,en,relation
+http://www.wikidata.org/prop/direct/P737,relation,influenced by,en,relation
+http://www.wikidata.org/prop/direct/P355,relation,child organization/unit,en,relation
+http://www.wikidata.org/prop/direct/P1537,relation,contributing factor of,en,relation
+http://www.wikidata.org/prop/direct/P2860,relation,cites work,en,relation
+http://www.wikidata.org/prop/direct/P105,relation,taxon rank,en,relation
+http://www.wikidata.org/prop/direct/P161,relation,cast member,en,relation
+http://www.wikidata.org/prop/direct/P137,relation,operator,en,relation
+http://www.wikidata.org/prop/direct/P421,relation,located in time zone,en,relation
+http://www.wikidata.org/prop/direct/P734,relation,family name,en,relation
+http://www.wikidata.org/prop/direct/P6658,relation,RCQ classification,en,relation
+http://www.wikidata.org/prop/direct/P1383,relation,contains settlement,en,relation
+http://www.wikidata.org/prop/direct/P407,relation,language of work or name,en,relation
+http://www.wikidata.org/prop/direct/P5707,relation,samples from work,en,relation
+http://www.wikidata.org/prop/direct/P3803,relation,original film format,en,relation
+http://www.wikidata.org/prop/direct/P2061,relation,aspect ratio (W:H),en,relation
+http://www.wikidata.org/prop/direct/P1343,relation,described by source,en,relation
+http://www.wikidata.org/prop/direct/P747,relation,has edition or translation,en,relation
+http://www.wikidata.org/prop/direct/P2365,relation,cognomen,en,relation
+http://www.wikidata.org/prop/direct/P658,relation,tracklist,en,relation
+http://www.wikidata.org/prop/direct/P708,relation,diocese,en,relation
+http://www.wikidata.org/prop/direct/P520,relation,armament,en,relation
+http://www.wikidata.org/prop/direct/P8693,relation,fandom,en,relation
+http://www.wikidata.org/prop/direct/P1411,relation,nominated for,en,relation
+http://www.wikidata.org/prop/direct/P1995,relation,health specialty,en,relation
+http://www.wikidata.org/prop/direct/P411,relation,canonization status,en,relation
+http://www.wikidata.org/prop/direct/P1303,relation,instrument,en,relation
+http://www.wikidata.org/prop/direct/P1412,relation,"languages spoken, written or signed",en,relation
+http://www.wikidata.org/prop/direct/P915,relation,filming location,en,relation
+http://www.wikidata.org/prop/direct/P2176,relation,drug or therapy used for treatment,en,relation
+http://www.wikidata.org/prop/direct/P1382,relation,partially coincident with,en,relation
+http://www.wikidata.org/prop/direct/P37,relation,official language,en,relation
+http://www.wikidata.org/prop/direct/P26,relation,spouse,en,relation
+http://www.wikidata.org/prop/direct/P118,relation,league or competition,en,relation
+http://www.wikidata.org/prop/direct/P1336,relation,territory claimed by,en,relation
+http://www.wikidata.org/prop/direct/P1889,relation,different from,en,relation
+http://www.wikidata.org/prop/direct/P1027,relation,conferred by,en,relation
+http://www.wikidata.org/prop/direct/P3938,relation,named by,en,relation
+http://www.wikidata.org/prop/direct/P85,relation,anthem,en,relation
+http://www.wikidata.org/prop/direct/P7047,relation,enemy,en,relation
+http://www.wikidata.org/prop/direct/P8402,relation,open data portal,en,relation
+http://www.wikidata.org/prop/direct/P69,relation,educated at,en,relation
+http://www.wikidata.org/prop/direct/P4608,relation,scenographer,en,relation
+http://www.wikidata.org/prop/direct/P767,relation,contributor to the creative work or subject,en,relation
+http://www.wikidata.org/prop/direct/P437,relation,distribution format,en,relation
+http://www.wikidata.org/prop/direct/P6978,relation,Scandinavian middle family name,en,relation
+http://www.wikidata.org/prop/direct/P800,relation,notable work,en,relation
+http://www.wikidata.org/prop/direct/P3174,relation,art director,en,relation
+http://www.wikidata.org/prop/direct/P2579,relation,studied by,en,relation
+http://www.wikidata.org/prop/direct/P417,relation,patron saint,en,relation
+http://www.wikidata.org/prop/direct/P2868,relation,subject has role,en,relation
+http://www.wikidata.org/prop/direct/P8345,relation,media franchise,en,relation
+http://www.wikidata.org/prop/direct/P5109,relation,has grammatical gender,en,relation
+http://www.wikidata.org/prop/direct/P530,relation,diplomatic relation,en,relation
+http://www.wikidata.org/prop/direct/P3018,relation,located in protected area,en,relation
+http://www.wikidata.org/prop/direct/P740,relation,location of formation,en,relation
+http://www.wikidata.org/prop/direct/P1427,relation,start point,en,relation
+http://www.wikidata.org/prop/direct/P50,relation,author,en,relation
+http://www.wikidata.org/prop/direct/P509,relation,cause of death,en,relation
+http://www.wikidata.org/prop/direct/P1049,relation,worshipped by,en,relation
+http://www.wikidata.org/prop/direct/P945,relation,allegiance,en,relation
+http://www.wikidata.org/prop/direct/P706,relation,located in/on physical feature,en,relation
+http://www.wikidata.org/prop/direct/P1290,relation,godparent,en,relation
+http://www.wikidata.org/prop/direct/P106,relation,occupation,en,relation
+http://www.wikidata.org/prop/direct/P598,relation,commander of (DEPRECATED),en,relation
+http://www.wikidata.org/prop/direct/P17,relation,country,en,relation
+http://www.wikidata.org/prop/direct/P1269,relation,facet of,en,relation
+http://www.wikidata.org/prop/direct/P1875,relation,represented by,en,relation
+http://www.wikidata.org/prop/direct/P101,relation,field of work,en,relation
+http://www.wikidata.org/prop/direct/P1557,relation,manifestation of,en,relation
+http://www.wikidata.org/prop/direct/P5869,relation,model item,en,relation
+http://www.wikidata.org/prop/direct/P25,relation,mother,en,relation
+http://www.wikidata.org/prop/direct/P1811,relation,list of episodes,en,relation
+http://www.wikidata.org/prop/direct/P306,relation,operating system,en,relation
+http://www.wikidata.org/prop/direct/P1192,relation,connecting service,en,relation
+http://www.wikidata.org/prop/direct/P4312,relation,camera setup,en,relation
+http://www.wikidata.org/prop/direct/P98,relation,editor,en,relation
+http://www.wikidata.org/prop/direct/P30,relation,continent,en,relation
+http://www.wikidata.org/prop/direct/P423,relation,shooting handedness,en,relation
+http://www.wikidata.org/prop/direct/P841,relation,feast day,en,relation
+http://www.wikidata.org/prop/direct/P3712,relation,has goal,en,relation
+http://www.wikidata.org/prop/direct/P769,relation,significant drug interaction,en,relation
+http://www.wikidata.org/prop/direct/P837,relation,day in year for periodic occurrence,en,relation
+http://www.wikidata.org/prop/direct/P5658,relation,railway traffic side,en,relation
+http://www.wikidata.org/prop/direct/P138,relation,named after,en,relation
+http://www.wikidata.org/prop/direct/P22,relation,father,en,relation
+http://www.wikidata.org/prop/direct/P5072,relation,presented in,en,relation
+http://www.wikidata.org/prop/direct/P2670,relation,has part(s) of the class,en,relation
+http://www.wikidata.org/prop/direct/P155,relation,follows,en,relation
+http://www.wikidata.org/prop/direct/P6291,relation,advertises,en,relation
+http://www.wikidata.org/prop/direct/P272,relation,production company,en,relation
+http://www.wikidata.org/prop/direct/P2684,relation,Kijkwijzer rating,en,relation
+http://www.wikidata.org/prop/direct/P2541,relation,operating area,en,relation
+http://www.wikidata.org/prop/direct/P5096,relation,member of the crew of,en,relation
+http://www.wikidata.org/prop/direct/P8138,relation,located in the statistical territorial entity,en,relation
+http://www.wikidata.org/prop/direct/P912,relation,has facility,en,relation
+http://www.wikidata.org/prop/direct/P1299,relation,depicted by,en,relation
+http://www.wikidata.org/prop/direct/P2853,relation,electrical plug type,en,relation
+http://www.wikidata.org/prop/direct/P2936,relation,language used,en,relation
+http://www.wikidata.org/prop/direct/P3428,relation,INCAA film rating,en,relation
+http://www.wikidata.org/prop/direct/P6364,relation,official color,en,relation
+http://www.wikidata.org/prop/direct/P1435,relation,heritage designation,en,relation
+http://www.wikidata.org/prop/direct/P2238,relation,official symbol,en,relation
+http://www.wikidata.org/prop/direct/P833,relation,interchange station,en,relation
+http://www.wikidata.org/prop/direct/P39,relation,position held,en,relation
+http://www.wikidata.org/prop/direct/P412,relation,voice type,en,relation
+http://www.wikidata.org/prop/direct/P10606,relation,notable role,en,relation
+http://www.wikidata.org/prop/direct/P408,relation,software engine,en,relation
+http://www.wikidata.org/prop/direct/P1419,relation,shape,en,relation
+http://www.wikidata.org/prop/direct/P140,relation,religion or worldview,en,relation
+http://www.wikidata.org/prop/direct/P2348,relation,time period,en,relation
+http://www.wikidata.org/prop/direct/P1034,relation,main food source,en,relation
+http://www.wikidata.org/prop/direct/P7137,relation,acknowledged,en,relation
+http://www.wikidata.org/prop/direct/P451,relation,unmarried partner,en,relation
+http://www.wikidata.org/prop/direct/P131,relation,located in the administrative territorial entity,en,relation
+http://www.wikidata.org/prop/direct/P793,relation,significant event,en,relation
+http://www.wikidata.org/prop/direct/P172,relation,ethnic group,en,relation
+http://www.wikidata.org/prop/direct/P6379,relation,has works in the collection,en,relation
+http://www.wikidata.org/prop/direct/P4647,relation,location of first performance,en,relation
+http://www.wikidata.org/prop/direct/P13459,relation,research project that contributed to this data set,en,relation
+http://www.wikidata.org/prop/direct/P2596,relation,culture,en,relation
+http://www.wikidata.org/prop/direct/P406,relation,soundtrack release,en,relation
+http://www.wikidata.org/prop/direct/P2922,relation,month of the year,en,relation
+http://www.wikidata.org/prop/direct/P463,relation,member of,en,relation
+http://www.wikidata.org/prop/direct/P2550,relation,recording or performance of,en,relation
+http://www.wikidata.org/prop/direct/P159,relation,headquarters location,en,relation
+http://www.wikidata.org/prop/direct/P136,relation,genre,en,relation
+http://www.wikidata.org/prop/direct/P97,relation,noble title,en,relation
+http://www.wikidata.org/prop/direct/P7327,relation,OFLC classification,en,relation
+http://www.wikidata.org/prop/direct/P5323,relation,attested in,en,relation
+http://www.wikidata.org/prop/direct/P5940,relation,plot expanded in,en,relation
+http://www.wikidata.org/prop/direct/P286,relation,head coach,en,relation
+http://www.wikidata.org/prop/direct/P371,relation,presenter,en,relation
+http://www.wikidata.org/prop/direct/P108,relation,employer,en,relation
+http://www.wikidata.org/prop/direct/P931,relation,place served by transport hub,en,relation
+http://www.wikidata.org/prop/direct/P9899,relation,music created for,en,relation
+http://www.wikidata.org/prop/direct/P2747,relation,Filmiroda rating,en,relation
+http://www.wikidata.org/prop/direct/P840,relation,narrative location,en,relation
+http://www.wikidata.org/prop/direct/P3828,relation,wears,en,relation
+http://www.wikidata.org/prop/direct/P163,relation,flag,en,relation
+http://www.wikidata.org/prop/direct/P797,relation,authority,en,relation
+http://www.wikidata.org/prop/direct/P450,relation,astronaut mission,en,relation
+http://www.wikidata.org/prop/direct/P803,relation,professorship,en,relation
+http://www.wikidata.org/prop/direct/P832,relation,public holiday,en,relation
+http://www.wikidata.org/prop/direct/P483,relation,recorded at studio or venue,en,relation
+http://www.wikidata.org/prop/direct/P3156,relation,Australian Classification,en,relation
+http://www.wikidata.org/prop/direct/P2756,relation,EIRIN film rating,en,relation
+http://www.wikidata.org/prop/direct/P135,relation,movement,en,relation
+http://www.wikidata.org/prop/direct/P126,relation,maintained by,en,relation
+http://www.wikidata.org/prop/direct/P3448,relation,stepparent,en,relation
+http://www.wikidata.org/prop/direct/P2925,relation,domain of saint or deity,en,relation
+http://www.wikidata.org/prop/direct/P466,relation,occupant,en,relation
+http://www.wikidata.org/prop/direct/P3216,relation,ClassInd rating,en,relation
+http://www.wikidata.org/prop/direct/P610,relation,highest point,en,relation
+http://www.wikidata.org/prop/direct/P3438,relation,vehicle normally used,en,relation
+http://www.wikidata.org/prop/direct/P12443,relation,has cabinet,en,relation
+http://www.wikidata.org/prop/direct/P237,relation,coat of arms,en,relation
+http://www.wikidata.org/prop/direct/P462,relation,color,en,relation
+http://www.wikidata.org/prop/direct/P4805,relation,make-up artist,en,relation
+http://www.wikidata.org/prop/direct/P366,relation,has use,en,relation
+http://www.wikidata.org/prop/direct/P1598,relation,consecrator,en,relation
+http://www.wikidata.org/prop/direct/P119,relation,place of burial,en,relation
+http://www.wikidata.org/prop/direct/P81,relation,connecting line,en,relation
+http://www.wikidata.org/prop/direct/P177,relation,crosses,en,relation
+http://www.wikidata.org/prop/direct/P3403,relation,coextensive with,en,relation
+http://www.wikidata.org/prop/direct/P921,relation,main subject,en,relation
+http://www.wikidata.org/prop/direct/P676,relation,lyricist,en,relation
+http://www.wikidata.org/prop/direct/P3461,relation,designated as terrorist by,en,relation
+http://www.wikidata.org/prop/direct/P84,relation,architect,en,relation
+http://www.wikidata.org/prop/direct/P1050,relation,medical condition,en,relation
+http://www.wikidata.org/prop/direct/P3075,relation,official religion,en,relation
+http://www.wikidata.org/prop/direct/P1576,relation,lifestyle,en,relation
+http://www.wikidata.org/prop/direct/P2416,relation,sports discipline competed in,en,relation
+http://www.wikidata.org/prop/direct/P780,relation,symptoms and signs,en,relation
+http://www.wikidata.org/prop/direct/P279,relation,subclass of,en,relation
+http://www.wikidata.org/prop/direct/P16,relation,transport network,en,relation
+http://www.wikidata.org/prop/direct/P512,relation,academic degree,en,relation
+http://www.wikidata.org/prop/direct/P47,relation,shares border with,en,relation
+http://www.wikidata.org/prop/direct/P11108,relation,recorded participant,en,relation
+http://www.wikidata.org/prop/direct/P749,relation,parent organization,en,relation
+http://www.wikidata.org/prop/direct/P8874,relation,Hong Kong film rating,en,relation
+http://www.wikidata.org/prop/direct/P1037,relation,director / manager,en,relation
+http://www.wikidata.org/prop/direct/P11738,relation,"handled, mitigated, or managed by",en,relation
+http://www.wikidata.org/prop/direct/P5021,relation,assessment,en,relation
+http://www.wikidata.org/prop/direct/P9600,relation,oral history at,en,relation
+http://www.wikidata.org/prop/direct/P6962,relation,narrative motif,en,relation
+http://www.wikidata.org/prop/direct/P1416,relation,affiliation,en,relation
+http://www.wikidata.org/prop/direct/P2564,relation,Köppen climate classification,en,relation
+http://www.wikidata.org/prop/direct/P559,relation,terminus,en,relation
+http://www.wikidata.org/prop/direct/P2578,relation,is the study of,en,relation
+http://www.wikidata.org/prop/direct/P1877,relation,after a work by,en,relation
+http://www.wikidata.org/prop/direct/P1880,relation,measurement scale,en,relation
+http://www.wikidata.org/prop/direct/P2894,relation,day of week,en,relation
+http://www.wikidata.org/prop/direct/P410,relation,military or police rank,en,relation
+http://www.wikidata.org/prop/direct/P1657,relation,MPA film rating,en,relation
+http://www.wikidata.org/prop/direct/P1029,relation,crew member,en,relation
+http://www.wikidata.org/prop/direct/P1165,relation,home world,en,relation
+http://www.wikidata.org/prop/direct/P1441,relation,present in work,en,relation
+http://www.wikidata.org/prop/direct/P276,relation,location,en,relation
+http://www.wikidata.org/prop/direct/P2629,relation,BBFC rating,en,relation
+http://www.wikidata.org/prop/direct/P197,relation,adjacent station,en,relation
+http://www.wikidata.org/prop/direct/P150,relation,contains the administrative territorial entity,en,relation
+http://www.wikidata.org/prop/direct/P3150,relation,birthday,en,relation
+http://www.wikidata.org/prop/direct/P1542,relation,has effect,en,relation
+http://www.wikidata.org/prop/direct/P631,relation,structural engineer,en,relation
+http://www.wikidata.org/prop/direct/P6087,relation,coach of sports team,en,relation
+http://www.wikidata.org/prop/direct/P8889,relation,MTRCB rating,en,relation
+http://www.wikidata.org/prop/direct/P3602,relation,candidacy in election,en,relation
+http://www.wikidata.org/prop/direct/P2184,relation,history of topic,en,relation
+http://www.wikidata.org/prop/direct/P364,relation,original language of film or TV show,en,relation
+http://www.wikidata.org/prop/direct/P35,relation,head of state,en,relation
+http://www.wikidata.org/prop/direct/P1830,relation,owner of,en,relation
+http://www.wikidata.org/prop/direct/P13574,relation,most populous urban area,en,relation
+http://www.wikidata.org/prop/direct/P5028,relation,sound designer,en,relation
+http://www.wikidata.org/prop/direct/P1923,relation,participating team,en,relation
+http://www.wikidata.org/prop/direct/P10241,relation,individual of taxon,en,relation
+http://www.wikidata.org/prop/direct/P495,relation,country of origin,en,relation
+http://www.wikidata.org/prop/direct/P2652,relation,partnership with,en,relation
+http://www.wikidata.org/prop/direct/P828,relation,has cause,en,relation
+http://www.wikidata.org/prop/direct/P4132,relation,linguistic typology,en,relation
+http://www.wikidata.org/prop/direct/P1478,relation,has immediate cause,en,relation
+http://www.wikidata.org/prop/direct/P870,relation,instrumentation,en,relation
+http://www.wikidata.org/prop/direct/P78,relation,top-level Internet domain,en,relation
+http://www.wikidata.org/prop/direct/P2359,relation,nomen gentilicium,en,relation
+http://www.wikidata.org/prop/direct/P205,relation,basin country,en,relation
+http://www.wikidata.org/prop/direct/P175,relation,performer,en,relation
+http://www.wikidata.org/prop/direct/P2634,relation,model,en,relation
+http://www.wikidata.org/prop/direct/P923,relation,medical examination,en,relation
+http://www.wikidata.org/prop/direct/P736,relation,cover art by,en,relation
+http://www.wikidata.org/prop/direct/P2408,relation,set in period,en,relation
+http://www.wikidata.org/prop/direct/P533,relation,target,en,relation
+http://www.wikidata.org/prop/direct/P4185,relation,iconographic symbol,en,relation
+http://www.wikidata.org/prop/direct/P1672,relation,this taxon is source of,en,relation
+http://www.wikidata.org/prop/direct/P5817,relation,state of use,en,relation
+http://www.wikidata.org/prop/direct/P611,relation,religious order,en,relation
+http://www.wikidata.org/prop/direct/P1196,relation,manner of death,en,relation
+http://www.wikidata.org/prop/direct/P8324,relation,funder,en,relation
+http://www.wikidata.org/prop/direct/P1990,relation,species kept,en,relation
+http://www.wikidata.org/prop/direct/P2388,relation,position held by head of the organization,en,relation
+http://www.wikidata.org/prop/direct/P38,relation,currency,en,relation
+http://www.wikidata.org/prop/direct/P3306,relation,ICAA rating,en,relation
+http://www.wikidata.org/prop/direct/P812,relation,academic major,en,relation
+http://www.wikidata.org/prop/direct/P241,relation,military branch,en,relation
+http://www.wikidata.org/prop/direct/P3092,relation,film crew member,en,relation
+http://www.wikidata.org/prop/direct/P1346,relation,winner,en,relation
+http://www.wikidata.org/prop/direct/P57,relation,director,en,relation
+http://www.wikidata.org/prop/direct/P2643,relation,Carnegie Classification of Institutions of Higher Education,en,relation
+http://www.wikidata.org/prop/direct/P1809,relation,choreographer,en,relation
+http://www.wikidata.org/prop/direct/P3301,relation,broadcast by,en,relation
+http://www.wikidata.org/prop/direct/P171,relation,parent taxon,en,relation
+http://www.wikidata.org/prop/direct/P144,relation,based on,en,relation
+http://www.wikidata.org/prop/direct/P194,relation,legislative body,en,relation
+http://www.wikidata.org/prop/direct/P10664,relation,featured track(s),en,relation
+http://www.wikidata.org/prop/direct/P4675,relation,appears in the form of,en,relation
+http://www.wikidata.org/prop/direct/P185,relation,doctoral student,en,relation
+http://www.wikidata.org/prop/direct/P449,relation,original broadcaster,en,relation
+http://www.wikidata.org/prop/direct/P641,relation,sport,en,relation
+http://www.wikidata.org/prop/direct/P7937,relation,form of creative work,en,relation
+http://www.wikidata.org/prop/direct/P3834,relation,RTC film rating,en,relation
+http://www.wikidata.org/prop/direct/P750,relation,distributed by,en,relation
+http://www.wikidata.org/prop/direct/P1434,relation,takes place in fictional universe,en,relation
+http://www.wikidata.org/prop/direct/P103,relation,native language,en,relation
+http://www.wikidata.org/prop/direct/P121,relation,item operated,en,relation
+http://www.wikidata.org/prop/direct/P1535,relation,used by,en,relation
+http://www.wikidata.org/prop/direct/P1444,relation,destination point,en,relation
+http://www.wikidata.org/prop/direct/P7153,relation,significant place,en,relation
+http://www.wikidata.org/prop/direct/P629,relation,edition or translation of,en,relation
+http://www.wikidata.org/prop/direct/P18,relation,image,en,relation
+http://www.wikidata.org/prop/direct/P647,relation,drafted by,en,relation
+http://www.wikidata.org/prop/direct/P21,relation,sex or gender,en,relation
+http://www.wikidata.org/prop/direct/P1479,relation,has contributing factor,en,relation
+http://www.wikidata.org/prop/direct/P3823,relation,Ethnologue language status,en,relation
+http://www.wikidata.org/prop/direct/P282,relation,writing system,en,relation
+http://www.wikidata.org/prop/direct/P942,relation,theme music,en,relation
+http://www.wikidata.org/prop/direct/P488,relation,chairperson,en,relation
+http://www.wikidata.org/prop/direct/P1340,relation,eye color,en,relation
+http://www.wikidata.org/prop/direct/P86,relation,composer,en,relation
+http://www.wikidata.org/prop/direct/P180,relation,depicts,en,relation
+http://www.wikidata.org/prop/direct/P206,relation,located in or next to body of water,en,relation
+http://www.wikidata.org/prop/direct/P2512,relation,has spin-off,en,relation
+http://www.wikidata.org/prop/direct/P669,relation,located on street,en,relation
+http://www.wikidata.org/prop/direct/P908,relation,PEGI rating,en,relation
+http://www.wikidata.org/prop/direct/P552,relation,handedness,en,relation
+http://www.wikidata.org/prop/direct/P425,relation,field of this occupation,en,relation
+http://www.wikidata.org/prop/direct/P190,relation,twinned administrative body,en,relation
+http://www.wikidata.org/prop/direct/P6166,relation,quotes work,en,relation
+http://www.wikidata.org/prop/direct/P2363,relation,NMHH film rating,en,relation
+http://www.wikidata.org/prop/direct/P2737,relation,union of,en,relation
+http://www.wikidata.org/prop/direct/P511,relation,honorific prefix,en,relation
+http://www.wikidata.org/prop/direct/P5056,relation,patronym or matronym,en,relation
+http://www.wikidata.org/prop/direct/P7938,relation,associated electoral district,en,relation
+http://www.wikidata.org/prop/direct/P210,relation,party chief representative,en,relation
+http://www.wikidata.org/prop/direct/P397,relation,parent astronomical body,en,relation
+http://www.wikidata.org/prop/direct/P1056,relation,product or material produced,en,relation
+http://www.wikidata.org/prop/direct/P5800,relation,narrative role,en,relation
+http://www.wikidata.org/prop/direct/P344,relation,director of photography,en,relation
+http://www.wikidata.org/prop/direct/P123,relation,publisher,en,relation
+http://www.wikidata.org/prop/direct/P3091,relation,mount,en,relation
+http://www.wikidata.org/prop/direct/P5201,relation,IMDA rating,en,relation
+http://www.wikidata.org/prop/direct/P974,relation,tributary,en,relation
+http://www.wikidata.org/prop/direct/P3320,relation,board member,en,relation
+http://www.wikidata.org/prop/direct/P9071,relation,character type,en,relation
+http://www.wikidata.org/prop/direct/P6886,relation,writing language,en,relation
+http://www.wikidata.org/prop/direct/P2505,relation,carries,en,relation
+http://www.wikidata.org/prop/direct/P6477,relation,does not have characteristic,en,relation
+http://www.wikidata.org/prop/direct/P36,relation,capital,en,relation
+http://www.wikidata.org/prop/direct/P1142,relation,political ideology,en,relation
+http://www.wikidata.org/prop/direct/P361,relation,part of,en,relation
+http://www.wikidata.org/prop/direct/P358,relation,discography,en,relation
+http://www.wikidata.org/prop/direct/P1035,relation,honorific suffix,en,relation
+http://www.wikidata.org/prop/direct/P91,relation,sexual orientation,en,relation
+http://www.wikidata.org/prop/direct/P9714,relation,taxon range,en,relation
+http://www.wikidata.org/prop/direct/P2142,relation,box office,en,relation
+http://www.wikidata.org/prop/direct/P8852,relation,facial hair,en,relation
+http://www.wikidata.org/prop/direct/P1365,relation,replaces,en,relation
+http://www.wikidata.org/prop/direct/P485,relation,archives at,en,relation
+http://www.wikidata.org/prop/direct/P264,relation,record label,en,relation
+http://www.wikidata.org/prop/direct/P9215,relation,set during recurring event,en,relation
+http://www.wikidata.org/prop/direct/P149,relation,architectural style,en,relation
+http://www.wikidata.org/prop/direct/P61,relation,discoverer or inventor,en,relation
+http://www.wikidata.org/prop/direct/P4584,relation,first appearance,en,relation
+http://www.wikidata.org/prop/direct/P102,relation,member of political party,en,relation
+http://www.wikidata.org/prop/direct/P1283,relation,filmography,en,relation
+http://www.wikidata.org/prop/direct/P11106,relation,alphabetical index,en,relation
+http://www.wikidata.org/prop/direct/P2283,relation,uses,en,relation
+http://www.wikidata.org/prop/direct/P9234,relation,supplement to,en,relation
+http://www.wikidata.org/prop/direct/P4614,relation,drainage basin,en,relation
+http://www.wikidata.org/prop/direct/P418,relation,"has seal, badge, or sigil",en,relation
+http://www.wikidata.org/prop/direct/P2587,relation,has phoneme,en,relation
+http://www.wikidata.org/prop/direct/P1433,relation,published in,en,relation
