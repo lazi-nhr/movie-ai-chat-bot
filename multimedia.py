@@ -87,23 +87,3 @@ class Multimedia:
             return (None, None, None, None)
 
         return self._best_match(surface, index)
-
-
-# --- quick test ---
-
-if __name__ == "__main__":
-    multimedia = Multimedia()
-
-    question = "Show me a picture of Halle Berry."
-    entity_label = "Leonardo DiCaprio"
-    print(f"Identified entity: {entity_label}.")
-
-    multimedia_type = multimedia.classify_type(question)
-    print(f"Identified multimedia type: {multimedia_type}.")
-
-    linked_label, linked_values, link_score, link_distance = multimedia.link_entity(
-        entity_label,
-        multimedia_type
-    )
-    print(f"Linked to multimedia entity: {linked_label} with score {link_score:.2f}.")
-    print(linked_values)

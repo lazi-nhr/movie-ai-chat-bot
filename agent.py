@@ -270,7 +270,8 @@ class Agent:
             # randomly select one multimedia value to return
             if linked_values:
                 selected_value = choice(linked_values)
-                return f"The {multimedia_type} for {linked_label} is: {selected_value}"
+                
+                return f"image:{selected_value}"
             else:
                 return f"No multimedia found for {linked_label}."
 
