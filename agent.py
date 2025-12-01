@@ -261,8 +261,9 @@ class Agent:
             return f"The answer suggested by embeddings is: {head_label} (type: {type_qid})"
         
         elif q_type == "multimedia":
-            print(f"Identified entity: {entity_label}.")
+            print(f"Extracted entity: {entity_label}.")
             multimedia_type = self.multimedia.classify_type(pure_q)
+            print(f"Identified multimedia type: {multimedia_type}.")
             linked_label, linked_values, link_score, link_distance = self.multimedia.link_entity(entity_label, multimedia_type)
             print(f"Linked to multimedia entity: {linked_label} with score {link_score:.2f}.")
 
