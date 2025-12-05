@@ -17,26 +17,40 @@ class Multimedia:
             self.backdrops_index = json.load(f)
 
     def classify_type(self, question: str) -> str:
+
         question_lower = question.lower()
 
         profile_keywords = [
-            "picture", "image", "photo", "look like", "selfie", "portrait", "headshot"
+            "picture", "image", "photo", "look like", "selfie", "portrait", "headshot",
+            "pic of", "photograph", "head shot", "mugshot", "face", "photos of",
+            "portrait photo", "celebrity photo", "actor photo", "actress photo",
+            "model photo", "image of", "looks like",
         ]
+
         poster_keywords = [
-            "poster", "cover", "movie poster", "film poster", "book cover"
+            "poster", "cover", "movie poster", "film poster", "book cover",
+            "movie cover", "dvd cover", "blu-ray cover", "cover art",
+            "key art", "official poster", "movie artwork", "film artwork",
+            "box art", "album cover", "game cover", "artwork",
         ]
+
         backdrop_keywords = [
-            "backdrop", "scene", "scenery", "background", "setting", "landscape"
+            "backdrop", "scene", "scenery", "background", "setting", "landscape",
+            "scene from", "movie still", "film still", "still image",
+            "movie frame", "frame from", "screenshot", "screen grab",
+            "capture from", "environment", "setting of", "wallpaper",
+            "wide shot", "cinematic shot",
         ]
-        
-        if any(keyword in question_lower for keyword in profile_keywords):
-            return "profile"
-        elif any(keyword in question_lower for keyword in poster_keywords):
+
+        if any(k in question_lower for k in poster_keywords):
             return "poster"
-        elif any(keyword in question_lower for keyword in backdrop_keywords):
+        elif any(k in question_lower for k in backdrop_keywords):
             return "backdrop"
+        elif any(k in question_lower for k in profile_keywords):
+            return "profile"
         else:
-            return "profile"  # default to profile if unsure
+            return None
+
 
     @staticmethod
     def _best_match(
@@ -53,7 +67,12 @@ class Multimedia:
         best_distance: Optional[int] = None
 
         for key, value in index.items():
+
             key_norm = key.lower()
+
+            if key_norm == surface_norm:
+                return key, value, 1.0, 0  # perfect match
+
             d = editdistance.eval(key_norm, surface_norm)
             if best_distance is None or d < best_distance:
                 best_label = key          # keep original casing for output

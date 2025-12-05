@@ -150,8 +150,7 @@ class Agent:
         # If no pattern matches, assume it's a general question
         return question, "general"
     
-    @staticmethod
-    def classify_question(question: str) -> tuple[str, str]:
+    def classify_question(self, question: str) -> tuple[str, str]:
         """
         A simpler version of question classification that looks for keywords and splits on ':'
         
@@ -166,12 +165,12 @@ class Agent:
         question_lower = question.lower()
         
         # check for SPARQL query indicators
-        if question_lower.startswith("prefix") or any(k in question_lower for k in ("select", "ask", "construct", "describe")):
+        if question_lower.lstrip().startswith("prefix") or re.search(r"\bselect\b.*\bwhere\b", question_lower):
             return question, "sparql"
         
         # check for keywords
         # recommendation keywords
-        elif "recommend" in question_lower:
+        elif any(k in question_lower for k in ("recommend", "suggest")):
             question_type = "recommendation"
 
         # factual keywords
@@ -182,21 +181,15 @@ class Agent:
         elif "embedding" in question_lower:
             question_type = "embedding"
 
-        # person multimedia keywords
-        elif "picture" in question_lower or "image" in question_lower or "photo" in question_lower or "look like" in question_lower:
-            question_type = "multimedia"
-
-        # movie multimedia keywords
-        elif "poster" in question_lower or "cover" in question_lower:
-            question_type = "multimedia"
-
-        # backdrop multimedia keywords
-        elif "backdrop" in question_lower or "scene" in question_lower or " scenery" in question_lower:
-            question_type = "multimedia"
-
         # default to general
         else:
-            question_type = "general"
+            # Let the Multimedia module decide if this is multimedia,
+            # otherwise default to general.
+            multimedia_type = self.multimedia.classify_type(question)
+            if multimedia_type is not None:
+                question_type = "multimedia"
+            else:
+                question_type = "general"
             
         # Extract pure question after the first colon (NOT NECESSARY ANYMORE)
         #if ":" in question:
@@ -219,8 +212,8 @@ class Agent:
         if q_type == "factual" or q_type == "general":
             entity = self.extraction.extract_entity_simple(pure_q) # simplified entity extraction for factual/general
             entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
-            print(f"Identified entity: {entity_label}.")
-            print(f"Identified relation: {relation_label}.")
+            print(f"Identified entity: '{entity_label}'.")
+            print(f"Identified relation: '{relation_label}'.")
             sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
             results = self.factual.sparql_query(sparql_query) # this should return a list with entities
             formatted_results = self.factual.get_labels(results)
@@ -235,7 +228,7 @@ class Agent:
 
         elif q_type == "recommendation":
             movie_list = self.extraction.extract_entities(pure_q)
-            print(f"Identified movies: {movie_list}.")
+            print(f"Identified movies: '{movie_list}'.")
             movies = self.recommendation.recommend_from_titles(movie_list)
             filtered_movies = self.recommendation.filter_recommendations(movie_list, movies["recommendations"])
             recs = []
@@ -246,8 +239,8 @@ class Agent:
             return " and ".join(recs) if recs else "No results found."
         
         elif q_type == "embedding":
-            print(f"Identified entity: {entity_label}.")
-            print(f"Identified relation: {relation_label}.")
+            print(f"Identified entity: '{entity_label}'.")
+            print(f"Identified relation: '{relation_label}'.")
 
             results = self.embeddings.get_best_result(
                 entity_uri,
@@ -263,11 +256,11 @@ class Agent:
             return f"The answer suggested by embeddings is: {head_label} (type: {type_qid})"
         
         elif q_type == "multimedia":
-            print(f"Extracted entity: {entity_label}.")
+            print(f"Extracted entity: '{entity_label}'.")
             multimedia_type = self.multimedia.classify_type(pure_q)
-            print(f"Identified multimedia type: {multimedia_type}.")
+            print(f"Identified multimedia type: '{multimedia_type}'.")
             linked_label, linked_values, link_score, link_distance = self.multimedia.link_entity(entity_label, multimedia_type)
-            print(f"Linked to multimedia entity: {linked_label} with score {link_score:.2f}.")
+            print(f"Linked to multimedia entity: '{linked_label}' with score {link_score:.2f}.")
 
             # randomly select one multimedia value to return
             if linked_values:
