@@ -217,6 +217,8 @@ class Agent:
         relation_label, relation_uri, relation_score, relation_distance = self.extraction.link_relation(relation)
 
         if q_type == "factual" or q_type == "general":
+            entity = self.extraction.extract_entity_simple(pure_q) # simplified entity extraction for factual/general
+            entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
             print(f"Identified entity: {entity_label}.")
             print(f"Identified relation: {relation_label}.")
             sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)

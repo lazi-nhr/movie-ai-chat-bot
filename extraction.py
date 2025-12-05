@@ -557,22 +557,28 @@ class Extraction(CRF):
                 return "screenwriter"
             if any(w in words for w in ["act", "acted", "actor", "star", "starring"]):
                 return "cast member"
+            if any(w in words for w in ["composer", "music", "score", "soundtrack", "composed", "compose"]):
+                return "composer"
                 
         if "what" in words:
             if "genre" in words or "type" in question:
                 return "genre"
             if any(w in words for w in ["country", "from"]):
-                return "country"
+                return "country of origin"
+            if any(w in words for w in ["award", "awards"]):
+                return "award received"
+            if any(w in words for w in ["nominated", "nomination"]):
+                return "nominated for"
                 
         if "when" in words:
             if any(phrase in question for phrase in ["come out", "came out", "release", "released"]):
-                return "release date"
+                return "publication date"
                 
         # Handle special cases where the relation might be implied
-        if "genre" in question or "type of film" in question:
+        if "genre" in question or "type of film" in question or "kind of movie" in question:
             return "genre"
         if "country" in question:
-            return "country"
+            return "country of origin"
             
         # If no specific relation is found, return None
         return None
