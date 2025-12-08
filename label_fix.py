@@ -15,7 +15,7 @@ def get_wikidata_labels_batch(qids):
         return {}
     
     # Wikidata allows up to 50 entities per request
-    batch_size = 10
+    batch_size = 1
     all_labels = {}
     missing_count = 0
     no_english_label_count = 0
@@ -48,7 +48,7 @@ def get_wikidata_labels_batch(qids):
                 
                 # Debug: print first batch response structure
                 if i == 0:
-                    tqdm.write(f"\n=== FIRST BATCH DEBUG ===")
+                    tqdm.write("\n=== FIRST BATCH DEBUG ===")
                     tqdm.write(f"Response keys: {list(data.keys())}")
                     if 'entities' in data:
                         tqdm.write(f"Number of entities returned: {len(data['entities'])}")
@@ -93,7 +93,7 @@ def get_wikidata_labels_batch(qids):
         except Exception as e:
             tqdm.write(f"Error fetching batch at index {i}: {e}")
     
-    tqdm.write(f"\n=== SUMMARY ===")
+    tqdm.write("\n=== SUMMARY ===")
     tqdm.write(f"Total labels fetched: {len(all_labels)}")
     tqdm.write(f"Missing entities: {missing_count}")
     tqdm.write(f"Entities without English labels: {no_english_label_count}")
