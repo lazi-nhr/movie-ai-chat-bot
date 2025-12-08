@@ -7,4 +7,5 @@ __pycache__
 cache/recommendation/ratings.csv
 cache/recommendation/movies.csv
 cache/entities/index_to_identifier.json
+cache/entities/label_to_identifier.json
 cache/ner_dataset.csv

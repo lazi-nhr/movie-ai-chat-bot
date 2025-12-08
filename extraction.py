@@ -504,8 +504,12 @@ class Extraction(CRF):
         if not surface:
             return (None, None, None, None)
 
-        with open("cache/entities/label_to_identifier.json", "r", encoding="utf-8") as f:
-            index = json.load(f)
+        #with open("cache/entities/label_to_identifier.json", "r", encoding="utf-8") as f:
+        #    index = json.load(f)
+
+        with open(os.path.join("cache/entities/identifier_to_label.json"), "r") as f:
+            ent2lbl = json.load(f)
+            index = {lbl: ent for ent, lbl in ent2lbl.items()}
 
         for key, value in index.items():
             tmp_distance = editdistance.eval(key, surface)

@@ -202,9 +202,6 @@ class Agent:
     def process_question(self, question: str) -> str:
         pure_q, q_type = self.classify_question(question)
         print(f"Classified  as type '{q_type}'.")
-
-        entity = self.extraction.extract_entity(pure_q)
-        entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
         
         relation = self.extraction.extract_relation(pure_q)
         relation_label, relation_uri, relation_score, relation_distance = self.extraction.link_relation(relation)
@@ -214,14 +211,30 @@ class Agent:
             entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
             print(f"Identified entity: '{entity_label}'.")
             print(f"Identified relation: '{relation_label}'.")
-            sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
-            results = self.factual.sparql_query(sparql_query) # this should return a list with entities
-            formatted_results = self.factual.get_labels(results)
-            return f"The answer is: {formatted_results}"
+
+            try: 
+                sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
+                results = self.factual.sparql_query(sparql_query) # this should return a list with entities
+                formatted_results = self.factual.get_labels(results)
+                return f"{formatted_results}"
+
+            except Exception as e:
+                print(f"Error during SPARQL translation or query: {e}")
+                print("Falling back to embedding-based retrieval.")
+                results = self.embeddings.get_best_result(
+                    entity_uri,
+                    relation_uri,
+                    1
+                )
+                head_uri, head_label, head_score, head_rank = results[0]
+
+                with open("cache/entities/entity_types.json", "r", encoding="utf-8") as f:
+                    entity_types = json.load(f)
+                
+                type_qid = entity_types.get(head_uri, "N/A")
+                return f"I think {head_label}"
         
         elif q_type == "sparql":
-            print(f"Identified entity: {entity_label}.")
-            print(f"Identified relation: {relation_label}.")
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
             return f"The result is: {formatted_results}"
@@ -239,6 +252,8 @@ class Agent:
             return " and ".join(recs) if recs else "No results found."
         
         elif q_type == "embedding":
+            entity = self.extraction.extract_entity(pure_q)
+            entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
             print(f"Identified entity: '{entity_label}'.")
             print(f"Identified relation: '{relation_label}'.")
 
@@ -256,6 +271,8 @@ class Agent:
             return f"The answer suggested by embeddings is: {head_label} (type: {type_qid})"
         
         elif q_type == "multimedia":
+            entity = self.extraction.extract_entity(pure_q)
+            entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
             print(f"Extracted entity: '{entity_label}'.")
             multimedia_type = self.multimedia.classify_type(pure_q)
             print(f"Identified multimedia type: '{multimedia_type}'.")
