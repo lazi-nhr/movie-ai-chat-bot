@@ -4,7 +4,6 @@ import re
 from tqdm import tqdm
 import time
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def is_qid(label):
     """Check if the label is a QID (e.g., Q95873202)"""
@@ -18,6 +17,8 @@ def get_wikidata_labels_batch(qids):
     # Wikidata allows up to 50 entities per request
     batch_size = 50
     all_labels = {}
+    missing_count = 0
+    no_english_label_count = 0
     
     # Set up headers with User-Agent (required by Wikidata)
     headers = {
@@ -45,25 +46,44 @@ def get_wikidata_labels_batch(qids):
             if response.status_code == 200:
                 data = response.json()
                 
-                # Debug: print first batch response
+                # Debug: print first batch response structure
                 if i == 0:
-                    tqdm.write(f"Sample response keys: {list(data.keys())}")
+                    tqdm.write(f"\n=== FIRST BATCH DEBUG ===")
+                    tqdm.write(f"Response keys: {list(data.keys())}")
                     if 'entities' in data:
+                        tqdm.write(f"Number of entities returned: {len(data['entities'])}")
                         sample_qid = list(data['entities'].keys())[0] if data['entities'] else None
                         if sample_qid:
-                            tqdm.write(f"Sample entity: {sample_qid}")
-                            tqdm.write(f"Sample entity data: {data['entities'][sample_qid]}")
+                            tqdm.write(f"Sample QID: {sample_qid}")
+                            sample_entity = data['entities'][sample_qid]
+                            tqdm.write(f"Sample entity keys: {list(sample_entity.keys())}")
+                            if 'labels' in sample_entity:
+                                tqdm.write(f"Sample labels: {sample_entity['labels']}")
+                    tqdm.write("=== END DEBUG ===\n")
                 
                 if 'entities' in data:
                     for qid, entity in data['entities'].items():
                         # Check if entity exists (not missing)
-                        if 'missing' not in entity:
-                            if 'labels' in entity and 'en' in entity['labels']:
+                        if 'missing' in entity:
+                            missing_count += 1
+                            if missing_count <= 3:
+                                tqdm.write(f"Missing entity: {qid}")
+                            continue
+                        
+                        if 'labels' in entity:
+                            if 'en' in entity['labels']:
                                 all_labels[qid] = entity['labels']['en']['value']
-                            elif 'labels' in entity and entity['labels']:
+                            elif entity['labels']:
                                 # Get first available label if English not available
                                 first_lang = list(entity['labels'].keys())[0]
                                 all_labels[qid] = entity['labels'][first_lang]['value']
+                                no_english_label_count += 1
+                                if no_english_label_count <= 3:
+                                    tqdm.write(f"No English label for {qid}, using {first_lang}: {entity['labels'][first_lang]['value']}")
+                        else:
+                            if missing_count + no_english_label_count <= 5:
+                                tqdm.write(f"No labels at all for {qid}")
+                                
             else:
                 tqdm.write(f"HTTP {response.status_code} for batch starting at index {i}")
                 if i == 0:
@@ -72,6 +92,11 @@ def get_wikidata_labels_batch(qids):
             time.sleep(0.1)  # Small delay between batch requests
         except Exception as e:
             tqdm.write(f"Error fetching batch at index {i}: {e}")
+    
+    tqdm.write(f"\n=== SUMMARY ===")
+    tqdm.write(f"Total labels fetched: {len(all_labels)}")
+    tqdm.write(f"Missing entities: {missing_count}")
+    tqdm.write(f"Entities without English labels: {no_english_label_count}")
     
     return all_labels
 
@@ -104,7 +129,13 @@ def main():
     # Fetch all labels in batches
     qid_to_label = get_wikidata_labels_batch(qids_to_fetch)
     
-    print(f"Successfully fetched {len(qid_to_label)} labels")
+    print(f"\nSuccessfully fetched {len(qid_to_label)} labels")
+    print(f"Failed to fetch: {len(qids_to_fetch) - len(qid_to_label)} labels")
+    
+    # Show some QIDs that failed
+    failed_qids = [qid for qid in qids_to_fetch if qid not in qid_to_label]
+    if failed_qids:
+        print(f"Sample failed QIDs: {failed_qids[:10]}")
     
     # Update the data
     updates_made = 0
@@ -114,11 +145,11 @@ def main():
             if new_label != qid:
                 data[url] = new_label
                 updates_made += 1
-                if updates_made <= 5:  # Show first 5 updates
+                if updates_made <= 10:  # Show first 10 updates
                     tqdm.write(f"Updated {qid} -> {new_label}")
     
     # Save all changes at once
-    print("Saving changes...")
+    print("\nSaving changes...")
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     
