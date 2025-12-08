@@ -86,7 +86,7 @@ class Factual():
                         label = self.embeddings.ent2lbl.get(uri, None)
 
                     if qid and label:
-                        lines.append(f"{label} ({qid})")
+                        lines.append(f"{label}")
                     elif label:
                         lines.append(label)
                     elif qid:

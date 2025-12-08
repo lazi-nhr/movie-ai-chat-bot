@@ -211,15 +211,14 @@ class Agent:
             entity_label, entity_uri, entity_score, entity_distance = self.extraction.link_entity(entity)
             print(f"Identified entity: '{entity_label}'.")
             print(f"Identified relation: '{relation_label}'.")
-
-            try: 
-                sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
-                results = self.factual.sparql_query(sparql_query) # this should return a list with entities
-                formatted_results = self.factual.get_labels(results)
+        
+            sparql_query = self.factual.translate_to_sparql(entity_uri, relation_uri)
+            results = self.factual.sparql_query(sparql_query) # this should return a list with entities
+            formatted_results = self.factual.get_labels(results)
+            if formatted_results != "No results found.":
                 return f"{formatted_results}"
-
-            except Exception as e:
-                print(f"Error during SPARQL translation or query: {e}")
+            else:
+                print("No results using SPARQL.")
                 print("Falling back to embedding-based retrieval.")
                 results = self.embeddings.get_best_result(
                     entity_uri,
@@ -233,7 +232,7 @@ class Agent:
                 
                 type_qid = entity_types.get(head_uri, "N/A")
                 return f"I think {head_label}"
-        
+    
         elif q_type == "sparql":
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
