@@ -15,7 +15,7 @@ def get_wikidata_labels_batch(qids):
         return {}
     
     # Wikidata allows up to 50 entities per request
-    batch_size = 50
+    batch_size = 10
     all_labels = {}
     missing_count = 0
     no_english_label_count = 0
