@@ -545,11 +545,6 @@ class Extraction(CRF):
         if entity_label:
             question = question.replace(entity_label.lower(), "").strip()
         
-        # Direct pattern matching for common film relation phrases
-        for relation_phrase, _ in film_relations.items():
-            if relation_phrase in question:
-                return relation_phrase
-                
         # Question-based relation mapping
         words = question.split()
         
@@ -569,10 +564,10 @@ class Extraction(CRF):
                 return "genre"
             if any(w in words for w in ["country", "from"]):
                 return "country of origin"
-            if any(w in words for w in ["award", "awards"]):
-                return "award received"
             if any(w in words for w in ["nominated", "nomination"]):
                 return "nominated for"
+            if any(w in words for w in ["award", "awards"]):
+                return "award received"
                 
         if "when" in words:
             if any(phrase in question for phrase in ["come out", "came out", "release", "released"]):
@@ -583,6 +578,11 @@ class Extraction(CRF):
             return "genre"
         if "country" in question:
             return "country of origin"
+        
+        # Direct pattern matching for common film relation phrases (fallback)
+        for relation_phrase, _ in film_relations.items():
+            if relation_phrase in question:
+                return relation_phrase
             
         # If no specific relation is found, return None
         return None
