@@ -6,7 +6,7 @@ from speakeasypy import Chatroom, EventType, Speakeasy
 from extraction import Extraction
 from embeddings import Embeddings
 from factual import Factual
-from recommendation import Recommendation
+from recommendation import MovieRecommender, ReusableRecommendationParts
 from multimedia import Multimedia
 from config import CONFIG
 
@@ -82,7 +82,9 @@ class Agent:
         self.extraction = Extraction()
         self.embeddings = Embeddings()
         self.factual = Factual()
-        self.recommendation = Recommendation()
+        #self.recommendation = Recommendation()
+        reusable = ReusableRecommendationParts()
+        self.recommendation3 = MovieRecommender(reusable)
         self.multimedia = Multimedia()
 
         self.speakeasy = Speakeasy(host=self.url, username=self.username, password=self.password)
@@ -237,18 +239,30 @@ class Agent:
             results = self.factual.sparql_query(pure_q)
             formatted_results = self.factual.get_labels(results)
             return f"The result is: {formatted_results}"
-
+        
         elif q_type == "recommendation":
             movie_list = self.extraction.extract_entities(pure_q)
+
             print(f"Identified movies: '{movie_list}'.")
-            movies = self.recommendation.recommend_from_titles(movie_list)
-            filtered_movies = self.recommendation.filter_recommendations(movie_list, movies["recommendations"])
-            recs = []
-            for recommendation in filtered_movies:
-                mid = recommendation["movie_id"]
-                recs.append(self.recommendation.id_to_clean_title[mid])
-                #recs.append(recommendation["title"])
-            return " and ".join(recs) if recs else "No results found."
+
+            # 1) first try normal movie-based recommender
+            recs = self.recommendation3.recommend(movie_list, top_n=5)
+
+            if recs:
+                titles_only = [t for t, mid in recs]
+                return " and ".join(titles_only)
+
+            # 2) fallback: clue-based recommender
+            print("No direct matches, trying clue-based recommendation...")
+            fallback_recs = self.recommendation3.recommend_from_clues(pure_q, top_n=5)
+
+            if fallback_recs:
+                titles_only = [t for t, mid in fallback_recs]
+                return " and ".join(titles_only)
+
+            return "No results found."
+
+
         
         elif q_type == "embedding":
             entity = self.extraction.extract_entity(pure_q)
@@ -291,3 +305,7 @@ class Agent:
 if __name__ == '__main__':
     demo_bot = Agent()
     demo_bot.listen()
+    # quick local test instead of Speakeasy
+    """ reusable = ReusableRecommendationParts()
+    r = MovieRecommender(reusable)
+    print(r.recommend(["Lion King", "Beauty and the Beast"], top_n=5)) """
