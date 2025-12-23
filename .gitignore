@@ -4,8 +4,8 @@ Tutorials
 dataset
 archive
 __pycache__
-cache/recommendation/ratings.csv
-cache/recommendation/movies.csv
-cache/entities/index_to_identifier.json
-cache/entities/label_to_identifier.json
-cache/ner_dataset.csv
+src/cache/recommendation/ratings.csv
+src/cache/recommendation/movies.csv
+src/cache/entities/index_to_identifier.json
+src/cache/entities/label_to_identifier.json
+src/cache/ner_dataset.csv
