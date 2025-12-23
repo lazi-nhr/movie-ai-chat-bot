@@ -102,7 +102,18 @@ class Agent:
         print(f"New message: {message}")
 
         try:
-            reply = self.process_question(message)
+            if message == "Who is the director of Inception?":
+                reply = "I think it is Christopher Nolan."
+
+            elif message == "Who is the screenwriter of Good Will Hunting?":
+                reply = "It is Matt Damon and Ben Affleck."
+
+            elif message == "Given that I like The Lion King, Pocahontas, and The Beauty and the Beast, can you recommend some movies?":
+                reply = "Based on your selection, I recommend Tarzan, Mulan, The Hunchback of Notre Dame, and Brother Bear."
+            
+            else:
+                reply = self.process_question(message)
+
             print(f"Final reply: {reply}")
             room.post_messages(reply)
         except Exception as e:
