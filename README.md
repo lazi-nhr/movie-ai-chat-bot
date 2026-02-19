@@ -11,7 +11,7 @@ The chatbot employs a multi-stage pipeline to process and respond to user querie
 3. **Entity Extraction**: A Named Entity Recognition (NER) system extracts relevant entities such as movie names, actor names, places, and dates when necessary
 
 <p align="center">
-  <img src="media/flowchart.jpg" alt="System Flowchart" width="90%">
+  <img src="media/flowchart.pdf" alt="System Flowchart" width="90%">
 </p>
 
 ## Supported Query Types
