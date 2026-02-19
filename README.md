@@ -1,4 +1,4 @@
-# ATAI Movie Chatbot
+# Movie Chatbot
 
 A specialized conversational AI agent designed to answer movie-related questions using advanced AI/ML concepts including embeddings, recommender systems, and Named Entity Recognition (NER). The chatbot runs on **Speakeasy**, an external client that provides an intuitive user interface for seamless interaction.
 
@@ -6,13 +6,14 @@ A specialized conversational AI agent designed to answer movie-related questions
 
 The chatbot employs a multi-stage pipeline to process and respond to user queries:
 
-1. **Classification**: An initial classifier analyzes incoming requests and assigns them to the appropriate request type
-2. **Routing**: The classified request is forwarded to the respective processing module
-3. **Entity Extraction**: A Named Entity Recognition (NER) system extracts relevant entities such as movie names, actor names, places, and dates when necessary
-
 <p align="center">
   <img src="media/flowchart.png" alt="System Flowchart" width="90%">
 </p>
+
+1. **Classification**: An initial classifier analyzes incoming requests and assigns them to the appropriate request type
+2. **Entity & Relation Extraction**: A Named Entity Recognition (NER) system extracts relevant entities such as movie names, actor names, places, and dates when necessary. Additionally, relation extraction identifies relationships between entities (e.g., "director of [movie]", "publication date of [movie]").
+3. **Request Handling**: Based on the classified request type, the system routes the query to the appropriate module. The specific requsts type handled is presented in the next section.
+4. **Answer Generation**: With the necessary information extracted, the system generates a response.
 
 ## Supported Query Types
 
