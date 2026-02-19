@@ -10,7 +10,9 @@ The chatbot employs a multi-stage pipeline to process and respond to user querie
 2. **Routing**: The classified request is forwarded to the respective processing module
 3. **Entity Extraction**: A Named Entity Recognition (NER) system extracts relevant entities such as movie names, actor names, places, and dates when necessary
 
-![System Flowchart](media/flowchart.jpg)
+<p align="center">
+  <img src="media/flowchart.jpg" alt="System Flowchart" width="90%">
+</p>
 
 ## Supported Query Types
 
@@ -25,7 +27,9 @@ The system leverages a **knowledge graph** to answer structured factual question
 
 The knowledge graph enables fast and accurate retrieval of structured data, making it ideal for straightforward factual queries.
 
-![Factual Questions](media/factual.png)
+<p align="center">
+  <img src="media/factual.png" alt="Factual Questions" width="50%">
+</p>
 
 ### 2. Embeddings-Based Search
 
@@ -38,7 +42,9 @@ Embeddings are dense vector representations of text that capture semantic meanin
 
 This approach bridges the gap between structured data retrieval and natural language understanding.
 
-![Embeddings](media/embedding.png)
+<p align="center">
+  <img src="media/embedding.png" alt="Embeddings" width="50%">
+</p>
 
 ### 3. Movie Recommendations
 
@@ -49,7 +55,9 @@ The chatbot features a **recommender system** that suggests movies based on user
 
 The recommendation engine analyzes movie features and user preferences to deliver relevant suggestions.
 
-![Recommendations](media/recommendation.png)
+<p align="center">
+  <img src="media/recommendation.png" alt="Recommendations" width="50%">
+</p>
 
 ### 4. Multimedia Content
 
@@ -60,7 +68,9 @@ The system provides **visual content** to enhance the user experience, including
 
 This multimedia capability makes interactions more engaging and informative by complementing textual responses with relevant visual content.
 
-![Multimedia](media/multimedia.png)
+<p align="center">
+  <img src="media/multimedia.png" alt="Multimedia" width="50%">
+</p>
 
 ## Technologies Used
 
