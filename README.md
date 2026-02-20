@@ -97,3 +97,7 @@ python src/agent.py
 ---
 
 *This project demonstrates the integration of multiple AI/ML techniques to create an intelligent, domain-specific conversational agent.*
+
+## Documentation
+
+For a more detailed description of the system architecture, implementation details, and evaluation results, please refer to [report.pdf](report.pdf).
