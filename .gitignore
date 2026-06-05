@@ -9,3 +9,5 @@ src/cache/recommendation/movies.csv
 src/cache/entities/index_to_identifier.json
 src/cache/entities/label_to_identifier.json
 src/cache/ner_dataset.csv
+
+**/.DS_Store
